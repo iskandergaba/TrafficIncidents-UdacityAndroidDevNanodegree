@@ -12,6 +12,12 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
 
+        <!--suppress AndroidDomInspection -->
+        <provider
+            android:authorities="com.gaba.alex.traffic_incidents.Data.IncidentsProvider"
+            android:name="com.gaba.alex.trafficincidents.Data.Provider.IncidentsProvider"
+            android:exported="false"/>
+
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyAnm2Qy2KOw8lOef4vXc9wBKHjv17yU1SA" />

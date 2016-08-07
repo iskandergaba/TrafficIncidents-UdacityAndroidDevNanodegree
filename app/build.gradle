@@ -1,4 +1,5 @@
 apply plugin: 'com.android.application'
+apply plugin: 'android-apt'
 
 android {
     compileSdkVersion 24
@@ -11,6 +12,7 @@ android {
         versionCode 1
         versionName "1.0"
     }
+
     buildTypes {
         release {
             minifyEnabled false
@@ -32,13 +34,13 @@ android {
 }
 
 
-
-
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
+    freeCompile 'com.google.android.gms:play-services-ads:9.4.0'
+    testCompile 'junit:junit:4.12'
     compile 'com.android.support:appcompat-v7:24.1.1'
     compile 'com.android.support:design:24.1.1'
+    compile 'net.simonvt.schematic:schematic:0.6.7'
     compile 'com.google.android.gms:play-services-places:9.4.0'
-    testCompile 'junit:junit:4.12'
-    freeCompile 'com.google.android.gms:play-services-ads:9.4.0'
+    compile 'com.google.android.gms:play-services-ads:9.4.0'
 }
