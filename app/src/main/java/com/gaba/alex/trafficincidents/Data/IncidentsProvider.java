@@ -2,16 +2,15 @@ package com.gaba.alex.trafficincidents.Data;
 
 import android.net.Uri;
 
+import net.simonvt.schematic.BuildConfig;
 import net.simonvt.schematic.annotation.ContentProvider;
 import net.simonvt.schematic.annotation.ContentUri;
 import net.simonvt.schematic.annotation.TableEndpoint;
 
 
-@ContentProvider(authority = IncidentsProvider.AUTHORITY,
-        database = IncidentsDatabase.class,
-        packageName = "com.gaba.alex.trafficincidents.Data.Provider")
+@ContentProvider(authority = IncidentsProvider.AUTHORITY, database = IncidentsDatabase.class)
 public class IncidentsProvider {
-    public static final String AUTHORITY = "com.gaba.alex.traffic_incidents.Data.IncidentsProvider";
+    public static final String AUTHORITY = BuildConfig.APPLICATION_ID + ".provider";
 
     static final Uri BASE_CONTENT_URI = Uri.parse("content://" + AUTHORITY);
 

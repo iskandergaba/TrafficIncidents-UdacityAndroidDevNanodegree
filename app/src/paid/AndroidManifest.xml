@@ -20,12 +20,6 @@
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
 
-        <!--suppress AndroidDomInspection -->
-        <provider
-            android:authorities="com.gaba.alex.traffic_incidents.Data.IncidentsProvider"
-            android:name="com.gaba.alex.trafficincidents.Data.Provider.IncidentsProvider"
-            android:exported="false"/>
-
 
         <activity
             android:name=".paid.MainActivity"
@@ -37,6 +31,12 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <provider
+            android:authorities="${applicationId}.provider"
+            android:name="com.gaba.alex.trafficincidents.Data.generated.IncidentsProvider"
+            android:exported="true"/>
+
     </application>
 
 </manifest>

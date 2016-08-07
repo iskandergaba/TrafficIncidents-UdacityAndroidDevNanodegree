@@ -3,7 +3,7 @@ package com.gaba.alex.trafficincidents.Data;
 import net.simonvt.schematic.annotation.Database;
 import net.simonvt.schematic.annotation.Table;
 
-@Database(version = IncidentsDatabase.VERSION, packageName = "com.gaba.alex.trafficincidents.Data.Provider")
+@Database(version = IncidentsDatabase.VERSION)
 public class IncidentsDatabase {
     private IncidentsDatabase(){}
 
