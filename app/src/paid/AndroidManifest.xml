@@ -11,15 +11,6 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <!--This meta-data tag is required to use Google Play Services.-->
-        <meta-data
-            android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyAnm2Qy2KOw8lOef4vXc9wBKHjv17yU1SA" />
-
-        <meta-data
-            android:name="com.google.android.gms.version"
-            android:value="@integer/google_play_services_version" />
-
 
         <activity
             android:name=".paid.MainActivity"
@@ -32,10 +23,28 @@
             </intent-filter>
         </activity>
 
+        <activity
+            android:name=".SettingsActivity"
+            android:label="@string/title_activity_settings"
+            android:parentActivityName=".paid.MainActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.gaba.alex.trafficincidents.paid.MainActivity" />
+        </activity>
+
         <provider
             android:authorities="${applicationId}.provider"
             android:name="com.gaba.alex.trafficincidents.Data.generated.IncidentsProvider"
             android:exported="true"/>
+
+        <!--This meta-data tag is required to use Google Play Services.-->
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyAnm2Qy2KOw8lOef4vXc9wBKHjv17yU1SA" />
+
+        <meta-data
+            android:name="com.google.android.gms.version"
+            android:value="@integer/google_play_services_version" />
 
     </application>
 

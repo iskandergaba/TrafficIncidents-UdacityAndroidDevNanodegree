@@ -13,6 +13,7 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.gaba.alex.trafficincidents.R;
+import com.gaba.alex.trafficincidents.SettingsActivity;
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.common.GooglePlayServicesRepairableException;
 import com.google.android.gms.location.places.Place;
@@ -77,6 +78,7 @@ public class MainActivity extends AppCompatActivity {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
+            startActivity(new Intent(this, SettingsActivity.class));
             return true;
         }
 

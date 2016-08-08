@@ -13,6 +13,7 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.gaba.alex.trafficincidents.R;
+import com.gaba.alex.trafficincidents.SettingsActivity;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
@@ -87,6 +88,7 @@ public class MainActivity extends AppCompatActivity {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
+            startActivity(new Intent(this, SettingsActivity.class));
             return true;
         }
 

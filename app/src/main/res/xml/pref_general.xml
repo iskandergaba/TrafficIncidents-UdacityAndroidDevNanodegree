@@ -1,0 +1,33 @@
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <PreferenceCategory android:title="@string/pref_general_settings" >
+
+        <ListPreference
+            android:key="prefAutoRefresh"
+            android:entries="@array/autoRefresh"
+            android:entryValues="@array/autoRefreshValues"
+            android:title="@string/pref_auto_refresh_title"
+            android:summary="@string/pref_auto_refresh_summary"
+            android:defaultValue="6"/>
+
+        <ListPreference
+            android:key="prefSearchRadius"
+            android:entries="@array/searchRadius"
+            android:summary="@string/pref_search_radius_summary"
+            android:entryValues="@array/searchRadiusValues"
+            android:title="@string/pref_search_radius_title"
+            android:defaultValue="10"/>
+
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="@string/pref_notification_settings">
+        <ListPreference
+            android:key="prefNotifications"
+            android:entries="@array/notificationsLevel"
+            android:summary="@string/pref_notifications_summary"
+            android:entryValues="@array/notificationsLevelValues"
+            android:title="@string/pref_notifications_title"
+            android:defaultValue="serious"/>
+    </PreferenceCategory>
+
+</PreferenceScreen>
