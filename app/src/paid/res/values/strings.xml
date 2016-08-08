@@ -1,4 +1,4 @@
 <resources>
     <string name="app_name">Traffic Incidents Pro</string>
-    <string name="action_settings">Settings</string>
+    <string name="account_type">com.gaba.alex.paid.traffic_incidents</string>
 </resources>

@@ -1,5 +1,8 @@
 package com.gaba.alex.trafficincidents.paid;
 
+import android.accounts.Account;
+import android.accounts.AccountManager;
+import android.content.ContentResolver;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -12,6 +15,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
+import com.gaba.alex.trafficincidents.Data.IncidentsProvider;
 import com.gaba.alex.trafficincidents.R;
 import com.gaba.alex.trafficincidents.SettingsActivity;
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
@@ -27,14 +31,18 @@ public class MainActivity extends AppCompatActivity {
     private final String PREF_LAT = "lat";
     private final String PREF_LNG = "lng";
     private final String PREF_ADDRESS = "address";
+    final String ACCOUNT_NAME = "Traffic Incidents Pro";
+    final String ACCOUNT_TYPE = "com.gaba.alex.paid.traffic_incidents";
+    final String AUTHORITY = IncidentsProvider.AUTHORITY;
+    Account mAccount;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        mAccount = createSyncAccount();
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
         PlacePicker.IntentBuilder builder = new PlacePicker.IntentBuilder();
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
         String address = preferences.getString(PREF_ADDRESS, "Tap to choose a location");
@@ -85,10 +93,20 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    private Account createSyncAccount() {
+        Account appAccount = new Account(ACCOUNT_NAME, ACCOUNT_TYPE);
+        AccountManager accountManager = AccountManager.get(getApplicationContext());
+        if (accountManager.addAccountExplicitly(appAccount, null, null)) {
+            ContentResolver.setMasterSyncAutomatically(true);
+            ContentResolver.setSyncAutomatically(appAccount, AUTHORITY, true);
+        }
+        return appAccount;
+    }
+
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == PLACE_PICKER_REQUEST) {
             if (resultCode == RESULT_OK) {
-                Place selectedPlace = PlacePicker.getPlace(data, this);
+                Place selectedPlace = PlacePicker.getPlace(this, data);
                 SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
                 SharedPreferences.Editor editor = preferences.edit();
                 editor.putString(PREF_LAT, selectedPlace.getLatLng().latitude + "");
