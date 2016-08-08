@@ -1,0 +1,3 @@
+<resources>
+    <string name="content_authority">com.gaba.alex.trafficincidents.free.debug.provider</string>
+</resources>

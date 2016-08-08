@@ -2,7 +2,8 @@ package com.gaba.alex.trafficincidents.Data;
 
 import android.net.Uri;
 
-import net.simonvt.schematic.BuildConfig;
+import com.gaba.alex.trafficincidents.BuildConfig;
+
 import net.simonvt.schematic.annotation.ContentProvider;
 import net.simonvt.schematic.annotation.ContentUri;
 import net.simonvt.schematic.annotation.TableEndpoint;

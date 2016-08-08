@@ -5,8 +5,22 @@ import android.content.AbstractThreadedSyncAdapter;
 import android.content.ContentProviderClient;
 import android.content.ContentResolver;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.SyncResult;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
+import android.util.Log;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
 
 /**
  * Handle the transfer of data between a server and an
@@ -16,6 +30,12 @@ public class IncidentsSyncAdapter extends AbstractThreadedSyncAdapter {
     // Global variables
     // Define a variable to contain a content resolver instance
     ContentResolver mContentResolver;
+    public static final String BING_BASE_URL = "http://dev.virtualearth.net/REST/v1/Traffic/Incidents/";
+    public static final String BING_API_KEY = "AusV2rdtPYqC440CZ4DV4GPUWv7tP8CSDdvATkk-bpChyUEw440vsCiOAkBj1Do0";
+    public static final String BING_JSON_RESOURCE_SETS_KEY = "resourceSets";
+    public static final String BING_JSON_RESULTS_KEY = "resources";
+    private final String PREF_LAT = "lat";
+    private final String PREF_LNG = "lng";
 
     /**
      * Set up the sync adapter
@@ -56,5 +76,51 @@ public class IncidentsSyncAdapter extends AbstractThreadedSyncAdapter {
     /*
      * Put the data transfer code here.
      */
+
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getContext());
+        Double lat = Double.parseDouble(preferences.getString(PREF_LAT, "0"));
+        Double lng = Double.parseDouble(preferences.getString(PREF_LNG, "0"));
+        String incidents = null;
+        JSONArray incidentsJSON;
+        HttpURLConnection urlConnection = null;
+        BufferedReader reader = null;
+        try {
+            String link = BING_BASE_URL + (lat - 5) + "," + (lng + 5) + "," + (lat + 5) + "," + (lng - 5) + "?key=" + BING_API_KEY;
+            URL url = new URL(link);
+            urlConnection = (HttpURLConnection) url.openConnection();
+            urlConnection.setRequestMethod("GET");
+            urlConnection.connect();
+            InputStream inputStream = urlConnection.getInputStream();
+            StringBuilder buffer = new StringBuilder();
+            reader = new BufferedReader(new InputStreamReader(inputStream));
+
+            String line;
+            while ((line = reader.readLine()) != null) {
+                buffer.append(line).append("\n");
+            }
+            incidents = buffer.toString();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+
+            if (urlConnection != null)
+                urlConnection.disconnect();
+
+            if (reader != null) {
+                try {
+                    reader.close();
+                } catch (final IOException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            try {
+                incidentsJSON = new JSONObject(incidents).getJSONArray(BING_JSON_RESOURCE_SETS_KEY).getJSONObject(0).getJSONArray(BING_JSON_RESULTS_KEY);
+                Log.v("fuck", incidentsJSON.toString());
+            } catch (JSONException | NullPointerException e) {
+                e.printStackTrace();
+            }
+        }
     }
 }
