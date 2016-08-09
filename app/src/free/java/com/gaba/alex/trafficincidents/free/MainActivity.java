@@ -39,8 +39,10 @@ public class MainActivity extends AppCompatActivity {
     final String ACCOUNT_NAME = "Traffic Incidents";
     final String ACCOUNT_TYPE = "com.gaba.alex.free.traffic_incidents";
     final String AUTHORITY = IncidentsProvider.AUTHORITY;
+    private static final long SECONDS_PER_HOUR = 3600L;
     private double mLat;
     private double mLng;
+    private SharedPreferences.OnSharedPreferenceChangeListener mPreferencesListener;
     Account mAccount;
 
     @Override
@@ -48,6 +50,16 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         mAccount = createSyncAccount();
+        configurePeriodicSync(mAccount);
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+        mPreferencesListener = new SharedPreferences.OnSharedPreferenceChangeListener() {
+            public void onSharedPreferenceChanged(SharedPreferences prefs, String key) {
+                if (key.equals("prefAutoRefresh")) {
+                    configurePeriodicSync(mAccount);
+                }
+            }
+        };
+        preferences.registerOnSharedPreferenceChangeListener(mPreferencesListener);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         mAdView = (AdView)findViewById(R.id.adView);
@@ -59,7 +71,6 @@ public class MainActivity extends AppCompatActivity {
                 .build();
         mAdView.loadAd(adRequest);
         PlacePicker.IntentBuilder builder = new PlacePicker.IntentBuilder();
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
         String address = preferences.getString(PREF_ADDRESS, "Tap to choose a location");
         TextView addressTextView = (TextView)findViewById(R.id.address);
         addressTextView.setText(address);
@@ -106,20 +117,28 @@ public class MainActivity extends AppCompatActivity {
         }
 
         else if (id == R.id.action_refresh) {
-            Bundle settingsBundle = new Bundle();
-            settingsBundle.putBoolean(ContentResolver.SYNC_EXTRAS_MANUAL, true);
-            settingsBundle.putBoolean(ContentResolver.SYNC_EXTRAS_EXPEDITED, true);
-        /*
-         * Request the sync for the default account, authority, and
-         * manual sync settings
-         */
-            ContentResolver.requestSync(mAccount, AUTHORITY, settingsBundle);
-
+            refresh();
             Toast.makeText(this, "Refreshing...", Toast.LENGTH_LONG).show();
             return true;
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected void onDestroy() {
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+        preferences.unregisterOnSharedPreferenceChangeListener(mPreferencesListener);
+        super.onDestroy();
+    }
+
+    public void refresh() {
+        Bundle settingsBundle = new Bundle();
+        settingsBundle.putBoolean(ContentResolver.SYNC_EXTRAS_MANUAL, true);
+        settingsBundle.putBoolean(ContentResolver.SYNC_EXTRAS_EXPEDITED, true);
+        settingsBundle.putDouble(PREF_LAT, mLat);
+        settingsBundle.putDouble(PREF_LNG, mLng);
+        ContentResolver.requestSync(mAccount, AUTHORITY, settingsBundle);
     }
 
     private Account createSyncAccount() {
@@ -132,17 +151,28 @@ public class MainActivity extends AppCompatActivity {
         return appAccount;
     }
 
+    private void configurePeriodicSync(Account appAccount) {
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+        int hourlySyncInterval = Integer.parseInt(preferences.getString("prefAutoRefresh", 6 + ""));
+        long SyncInterval = hourlySyncInterval * SECONDS_PER_HOUR;
+        Bundle settingsBundle = new Bundle();
+        settingsBundle.putDouble(PREF_LAT, mLat);
+        settingsBundle.putDouble(PREF_LNG, mLng);
+        ContentResolver.removePeriodicSync(appAccount, AUTHORITY, Bundle.EMPTY);
+        if (hourlySyncInterval > 0) {
+            ContentResolver.addPeriodicSync(appAccount, AUTHORITY, settingsBundle, SyncInterval);
+        }
+    }
+
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == PLACE_PICKER_REQUEST) {
 
             SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
-            double lat = Double.parseDouble(preferences.getString(PREF_LAT, "0"));
-            double lng = Double.parseDouble(preferences.getString(PREF_LNG, "0"));
             if (resultCode == RESULT_OK) {
                 Place selectedPlace = PlacePicker.getPlace(this, data);
                 double newLat = selectedPlace.getLatLng().latitude;
                 double newLng = selectedPlace.getLatLng().longitude;
-                if (newLat != lat || newLng != lng) {
+                if (newLat != mLat || newLng != mLng) {
                     mLat = newLat;
                     mLng = newLng;
                     SharedPreferences.Editor editor = preferences.edit();
@@ -160,10 +190,7 @@ public class MainActivity extends AppCompatActivity {
                     } catch (GooglePlayServicesRepairableException | GooglePlayServicesNotAvailableException e) {
                         e.printStackTrace();
                     }
-                    Bundle settingsBundle = new Bundle();
-                    settingsBundle.putBoolean(ContentResolver.SYNC_EXTRAS_MANUAL, true);
-                    settingsBundle.putBoolean(ContentResolver.SYNC_EXTRAS_EXPEDITED, true);
-                    ContentResolver.requestSync(mAccount, AUTHORITY, settingsBundle);
+                    refresh();
                 }
 
             }

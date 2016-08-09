@@ -6,11 +6,9 @@ import android.content.ContentProviderClient;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.OperationApplicationException;
-import android.content.SharedPreferences;
 import android.content.SyncResult;
 import android.os.Bundle;
 import android.os.RemoteException;
-import android.preference.PreferenceManager;
 import android.util.Log;
 
 import com.gaba.alex.trafficincidents.Utility;
@@ -51,45 +49,19 @@ public class IncidentsSyncAdapter extends AbstractThreadedSyncAdapter {
         mContentResolver = context.getContentResolver();
     }
 
-    /**
-     * Set up the sync adapter. This form of the
-     * constructor maintains compatibility with Android 3.0
-     * and later platform versions
-     */
-    public IncidentsSyncAdapter(
-            Context context,
-            boolean autoInitialize,
-            boolean allowParallelSyncs) {
-        super(context, autoInitialize, allowParallelSyncs);
-        /*
-         * If your app uses a content resolver, get an instance of it
-         * from the incoming Context
-         */
-        mContentResolver = context.getContentResolver();
-    }
-
     @Override
-    public void onPerformSync(
-            Account account,
-            Bundle extras,
-            String authority,
-            ContentProviderClient provider,
-            SyncResult syncResult) {
-    /*
-     * Put the data transfer code here.
-     */
-
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getContext());
+    public void onPerformSync(Account account, Bundle extras, String authority, ContentProviderClient provider, SyncResult syncResult) {
         String prefLat = "lat";
-        Double lat = Double.parseDouble(preferences.getString(prefLat, "0"));
+        double lat = extras.getDouble(prefLat);
         String prefLng = "lng";
-        Double lng = Double.parseDouble(preferences.getString(prefLng, "0"));
+        double lng = extras.getDouble(prefLng);
         String incidents = null;
         JSONArray incidentsJSON;
         HttpURLConnection urlConnection = null;
         BufferedReader reader = null;
         try {
-            String link = BING_BASE_URL + (lat - 0.1) + "," + (lng + 0.1) + "," + (lat + 0.1) + "," + (lng - 0.1) + "?key=" + BING_API_KEY;
+            String link = BING_BASE_URL + (lat - 0.1) + "," + (lng + 0.1) + "," + (lat + 0.1) + "," + (lng - 0.1)
+                    + "?key=" + BING_API_KEY;
             URL url = new URL(link);
             Log.v("fuck", link);
             urlConnection = (HttpURLConnection) url.openConnection();

@@ -29,8 +29,8 @@ public class IncidentsAdapter extends SimpleCursorAdapter {
             "Construction", "Alert", "Weather"};
     private final String[] SEVERITY_CODES = {"Low Impact", "Minor", "Moderate", "Serious"};
 
-    public IncidentsAdapter(Context context, int layout, Cursor c, String[] from, int[] to) {
-        super(context, layout, c, from, to, 0);
+    public IncidentsAdapter(Context context, int layout, Cursor c) {
+        super(context, layout, c, new String[0], new int[0], 0);
         this.layout = layout;
         this.mContext = context;
         this.inflater = LayoutInflater.from(context);

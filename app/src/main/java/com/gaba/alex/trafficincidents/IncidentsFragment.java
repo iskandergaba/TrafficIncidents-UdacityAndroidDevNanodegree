@@ -14,7 +14,6 @@ import android.view.ViewGroup;
 import android.widget.ListView;
 
 import com.gaba.alex.trafficincidents.Adapter.IncidentsAdapter;
-import com.gaba.alex.trafficincidents.Data.IncidentsColumns;
 import com.gaba.alex.trafficincidents.Data.IncidentsProvider;
 import com.melnykov.fab.FloatingActionButton;
 
@@ -41,11 +40,7 @@ public class IncidentsFragment extends Fragment implements LoaderManager.LoaderC
 
         mListView = (ListView)rootView.findViewById(R.id.list_view);
 
-        mAdapter = new IncidentsAdapter(getActivity().getBaseContext(),
-                R.layout.list_view_item,
-                null,
-                new String[] { IncidentsColumns.TYPE, IncidentsColumns.DESCRIPTION, IncidentsColumns.ROAD_CLOSED, IncidentsColumns.SEVERITY},
-                new int[] { R.id.incident_type , R.id.incident_description, R.id.incident_road_closed, R.id.incident_severity});
+        mAdapter = new IncidentsAdapter(getActivity().getBaseContext(), R.layout.list_view_item, null);
         mListView.setAdapter(mAdapter);
         FloatingActionButton fab = (FloatingActionButton)rootView.findViewById(R.id.fab);
         fab.attachToListView(mListView);
