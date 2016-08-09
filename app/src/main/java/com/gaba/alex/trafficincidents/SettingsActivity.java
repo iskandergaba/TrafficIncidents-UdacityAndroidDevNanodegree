@@ -12,6 +12,12 @@ public class SettingsActivity extends AppCompatActivity {
         getFragmentManager().beginTransaction().replace(android.R.id.content, new MyPreferenceFragment()).commit();
     }
 
+    @Override
+    public boolean onSupportNavigateUp() {
+        super.onBackPressed();
+        return true;
+    }
+
     public static class MyPreferenceFragment extends PreferenceFragment
     {
         @Override

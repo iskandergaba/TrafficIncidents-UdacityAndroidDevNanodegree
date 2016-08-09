@@ -11,7 +11,7 @@
             android:defaultValue="6"/>
 
         <ListPreference
-            android:key="prefSearchRadius"
+            android:key="prefSearchRange"
             android:entries="@array/searchRange"
             android:summary="@string/pref_search_range_summary"
             android:entryValues="@array/searchRangeValues"
