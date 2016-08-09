@@ -16,6 +16,7 @@ import android.widget.ListView;
 import com.gaba.alex.trafficincidents.Adapter.IncidentsAdapter;
 import com.gaba.alex.trafficincidents.Data.IncidentsColumns;
 import com.gaba.alex.trafficincidents.Data.IncidentsProvider;
+import com.melnykov.fab.FloatingActionButton;
 
 /**
  * A placeholder fragment containing a simple view.
@@ -46,9 +47,9 @@ public class IncidentsFragment extends Fragment implements LoaderManager.LoaderC
                 new String[] { IncidentsColumns.TYPE, IncidentsColumns.DESCRIPTION, IncidentsColumns.ROAD_CLOSED, IncidentsColumns.SEVERITY},
                 new int[] { R.id.incident_type , R.id.incident_description, R.id.incident_road_closed, R.id.incident_severity});
         mListView.setAdapter(mAdapter);
+        FloatingActionButton fab = (FloatingActionButton)rootView.findViewById(R.id.fab);
+        fab.attachToListView(mListView);
 
-        /** Creating a loader for populating listview from sqlite database */
-        /** This statement, invokes the method onCreatedLoader() */
         getActivity().getSupportLoaderManager().initLoader(0, null, this);
         return rootView;
     }

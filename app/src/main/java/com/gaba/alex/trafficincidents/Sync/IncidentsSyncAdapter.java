@@ -89,7 +89,7 @@ public class IncidentsSyncAdapter extends AbstractThreadedSyncAdapter {
         HttpURLConnection urlConnection = null;
         BufferedReader reader = null;
         try {
-            String link = BING_BASE_URL + (lat - 3) + "," + (lng + 3) + "," + (lat + 3) + "," + (lng - 3) + "?key=" + BING_API_KEY;
+            String link = BING_BASE_URL + (lat - 0.1) + "," + (lng + 0.1) + "," + (lat + 0.1) + "," + (lng - 0.1) + "?key=" + BING_API_KEY;
             URL url = new URL(link);
             Log.v("fuck", link);
             urlConnection = (HttpURLConnection) url.openConnection();

@@ -12,11 +12,11 @@
 
         <ListPreference
             android:key="prefSearchRadius"
-            android:entries="@array/searchRadius"
-            android:summary="@string/pref_search_radius_summary"
-            android:entryValues="@array/searchRadiusValues"
-            android:title="@string/pref_search_radius_title"
-            android:defaultValue="10"/>
+            android:entries="@array/searchRange"
+            android:summary="@string/pref_search_range_summary"
+            android:entryValues="@array/searchRangeValues"
+            android:title="@string/pref_search_range_title"
+            android:defaultValue="0.05"/>
 
     </PreferenceCategory>
 

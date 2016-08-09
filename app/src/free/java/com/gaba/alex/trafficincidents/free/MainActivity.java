@@ -7,7 +7,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
@@ -27,6 +26,7 @@ import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.ui.PlacePicker;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
+import com.melnykov.fab.FloatingActionButton;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -39,6 +39,8 @@ public class MainActivity extends AppCompatActivity {
     final String ACCOUNT_NAME = "Traffic Incidents";
     final String ACCOUNT_TYPE = "com.gaba.alex.free.traffic_incidents";
     final String AUTHORITY = IncidentsProvider.AUTHORITY;
+    private double mLat;
+    private double mLng;
     Account mAccount;
 
     @Override
@@ -62,10 +64,11 @@ public class MainActivity extends AppCompatActivity {
         TextView addressTextView = (TextView)findViewById(R.id.address);
         addressTextView.setText(address);
         if (preferences.contains(PREF_LAT) && preferences.contains(PREF_LNG)) {
-            Double lat = Double.parseDouble(preferences.getString(PREF_LAT, "0"));
-            Double lng = Double.parseDouble(preferences.getString(PREF_LNG, "0"));
-            builder.setLatLngBounds(new LatLngBounds(new LatLng(lat, lng), new LatLng(lat, lng)));
+            mLat = Double.parseDouble(preferences.getString(PREF_LAT, "0"));
+            mLng = Double.parseDouble(preferences.getString(PREF_LNG, "0"));
+            builder.setLatLngBounds(new LatLngBounds(new LatLng(mLat, mLng), new LatLng(mLat, mLng)));
         }
+
 
         try {
             mPlacePickerIntent = builder.build(this);
@@ -131,26 +134,38 @@ public class MainActivity extends AppCompatActivity {
 
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == PLACE_PICKER_REQUEST) {
+
+            SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+            double lat = Double.parseDouble(preferences.getString(PREF_LAT, "0"));
+            double lng = Double.parseDouble(preferences.getString(PREF_LNG, "0"));
             if (resultCode == RESULT_OK) {
                 Place selectedPlace = PlacePicker.getPlace(this, data);
-                SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
-                SharedPreferences.Editor editor = preferences.edit();
-                editor.putString(PREF_LAT, selectedPlace.getLatLng().latitude + "");
-                editor.putString(PREF_LNG, selectedPlace.getLatLng().longitude + "");
-                editor.putString(PREF_ADDRESS, selectedPlace.getAddress().toString());
-                editor.apply();
-                PlacePicker.IntentBuilder builder = new PlacePicker.IntentBuilder();
-                Double lat = Double.parseDouble(preferences.getString(PREF_LAT, "0"));
-                Double lng = Double.parseDouble(preferences.getString(PREF_LNG, "0"));
-                String address = preferences.getString(PREF_ADDRESS, "Location");
-                TextView addressTextView = (TextView)findViewById(R.id.address);
-                addressTextView.setText(address);
-                builder.setLatLngBounds(new LatLngBounds(new LatLng(lat, lng), new LatLng(lat, lng)));
-                try {
-                    mPlacePickerIntent = builder.build(this);
-                } catch (GooglePlayServicesRepairableException | GooglePlayServicesNotAvailableException e) {
-                    e.printStackTrace();
+                double newLat = selectedPlace.getLatLng().latitude;
+                double newLng = selectedPlace.getLatLng().longitude;
+                if (newLat != lat || newLng != lng) {
+                    mLat = newLat;
+                    mLng = newLng;
+                    SharedPreferences.Editor editor = preferences.edit();
+                    editor.putString(PREF_LAT, newLat + "");
+                    editor.putString(PREF_LNG, newLng + "");
+                    editor.putString(PREF_ADDRESS, selectedPlace.getAddress().toString());
+                    editor.apply();
+                    PlacePicker.IntentBuilder builder = new PlacePicker.IntentBuilder();
+                    String address = preferences.getString(PREF_ADDRESS, "Location");
+                    TextView addressTextView = (TextView)findViewById(R.id.address);
+                    addressTextView.setText(address);
+                    builder.setLatLngBounds(new LatLngBounds(new LatLng(newLat, newLng), new LatLng(newLat, newLng)));
+                    try {
+                        mPlacePickerIntent = builder.build(this);
+                    } catch (GooglePlayServicesRepairableException | GooglePlayServicesNotAvailableException e) {
+                        e.printStackTrace();
+                    }
+                    Bundle settingsBundle = new Bundle();
+                    settingsBundle.putBoolean(ContentResolver.SYNC_EXTRAS_MANUAL, true);
+                    settingsBundle.putBoolean(ContentResolver.SYNC_EXTRAS_EXPEDITED, true);
+                    ContentResolver.requestSync(mAccount, AUTHORITY, settingsBundle);
                 }
+
             }
         }
     }
