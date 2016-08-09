@@ -5,11 +5,15 @@ import android.content.AbstractThreadedSyncAdapter;
 import android.content.ContentProviderClient;
 import android.content.ContentResolver;
 import android.content.Context;
+import android.content.OperationApplicationException;
 import android.content.SharedPreferences;
 import android.content.SyncResult;
 import android.os.Bundle;
+import android.os.RemoteException;
 import android.preference.PreferenceManager;
 import android.util.Log;
+
+import com.gaba.alex.trafficincidents.Utility;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -34,8 +38,6 @@ public class IncidentsSyncAdapter extends AbstractThreadedSyncAdapter {
     public static final String BING_API_KEY = "AusV2rdtPYqC440CZ4DV4GPUWv7tP8CSDdvATkk-bpChyUEw440vsCiOAkBj1Do0";
     public static final String BING_JSON_RESOURCE_SETS_KEY = "resourceSets";
     public static final String BING_JSON_RESULTS_KEY = "resources";
-    private final String PREF_LAT = "lat";
-    private final String PREF_LNG = "lng";
 
     /**
      * Set up the sync adapter
@@ -78,15 +80,18 @@ public class IncidentsSyncAdapter extends AbstractThreadedSyncAdapter {
      */
 
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getContext());
-        Double lat = Double.parseDouble(preferences.getString(PREF_LAT, "0"));
-        Double lng = Double.parseDouble(preferences.getString(PREF_LNG, "0"));
+        String prefLat = "lat";
+        Double lat = Double.parseDouble(preferences.getString(prefLat, "0"));
+        String prefLng = "lng";
+        Double lng = Double.parseDouble(preferences.getString(prefLng, "0"));
         String incidents = null;
         JSONArray incidentsJSON;
         HttpURLConnection urlConnection = null;
         BufferedReader reader = null;
         try {
-            String link = BING_BASE_URL + (lat - 5) + "," + (lng + 5) + "," + (lat + 5) + "," + (lng - 5) + "?key=" + BING_API_KEY;
+            String link = BING_BASE_URL + (lat - 3) + "," + (lng + 3) + "," + (lat + 3) + "," + (lng - 3) + "?key=" + BING_API_KEY;
             URL url = new URL(link);
+            Log.v("fuck", link);
             urlConnection = (HttpURLConnection) url.openConnection();
             urlConnection.setRequestMethod("GET");
             urlConnection.connect();
@@ -117,8 +122,9 @@ public class IncidentsSyncAdapter extends AbstractThreadedSyncAdapter {
 
             try {
                 incidentsJSON = new JSONObject(incidents).getJSONArray(BING_JSON_RESOURCE_SETS_KEY).getJSONObject(0).getJSONArray(BING_JSON_RESULTS_KEY);
-                Log.v("fuck", incidentsJSON.toString());
-            } catch (JSONException | NullPointerException e) {
+                int statusCode = new JSONObject(incidents).getInt("statusCode");
+                Utility.updateDatabase(getContext(), incidentsJSON, statusCode);
+            } catch (JSONException | NullPointerException |OperationApplicationException | RemoteException e) {
                 e.printStackTrace();
             }
         }
