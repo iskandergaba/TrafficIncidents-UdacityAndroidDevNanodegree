@@ -37,8 +37,6 @@ public class Utility {
             }
             context.getContentResolver().applyBatch(IncidentsProvider.AUTHORITY, batchOperations);
         }
-
-
     }
 
     public static void pushNotification(Context context, double lat, double lng, double range, int severity) {

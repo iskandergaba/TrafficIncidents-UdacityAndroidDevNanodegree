@@ -45,12 +45,12 @@ public class IncidentsAdapter extends SimpleCursorAdapter {
     public void bindView(View view, final Context context, Cursor cursor) {
         super.bindView(view, context, cursor);
 
-        int type = cursor.getInt(cursor.getColumnIndexOrThrow(IncidentsColumns.TYPE));
-        int severity = cursor.getInt(cursor.getColumnIndexOrThrow(IncidentsColumns.SEVERITY));
+        final int type = cursor.getInt(cursor.getColumnIndexOrThrow(IncidentsColumns.TYPE));
+        final int severity = cursor.getInt(cursor.getColumnIndexOrThrow(IncidentsColumns.SEVERITY));
         final double lat = cursor.getDouble(cursor.getColumnIndexOrThrow(IncidentsColumns.LAT));
         final double lng = cursor.getDouble(cursor.getColumnIndexOrThrow(IncidentsColumns.LNG));
         final long dateInMillis = Long.parseLong(cursor.getString(cursor.getColumnIndexOrThrow(IncidentsColumns.END_DATE)));
-        boolean roadClosed = Boolean.valueOf(cursor.getString(cursor.getColumnIndexOrThrow(IncidentsColumns.ROAD_CLOSED)));
+        final boolean roadClosed = Boolean.valueOf(cursor.getString(cursor.getColumnIndexOrThrow(IncidentsColumns.ROAD_CLOSED)));
         final String description = "Local description: " +  cursor.getString(cursor.getColumnIndexOrThrow(IncidentsColumns.DESCRIPTION));
 
 
@@ -66,11 +66,7 @@ public class IncidentsAdapter extends SimpleCursorAdapter {
 
         TextView roadClosedTextView = (TextView) view.findViewById(R.id.incident_road_closed);
         if (roadClosedTextView != null) {
-            if (roadClosed) {
-                roadClosedTextView.setText("Road Closed: Yes");
-            } else {
-                roadClosedTextView.setText("Road Closed: No");
-            }
+            roadClosedTextView.setText("Road Closed: " + (roadClosed ? "Yes" : "No"));
         }
 
         TextView dateTextView = (TextView) view.findViewById(R.id.incident_update);
@@ -105,7 +101,9 @@ public class IncidentsAdapter extends SimpleCursorAdapter {
             public void onClick(View view) {
                 Intent intent = new Intent(Intent.ACTION_SEND);
                 intent.setType("text/plain");
-                String shareText = description;
+                String shareText = TYPE_CODES[type - 1] + "\n\n" + description + "\n\nSeverity: "
+                        + SEVERITY_CODES[severity - 1] + "\n\nRoad closed: " +
+                        (roadClosed ?  "Yes" : "No") + "\n\nInformation provided by: " + context.getString(R.string.app_name);
                 intent.putExtra(Intent.EXTRA_TEXT, shareText);
                 if (intent.resolveActivity(mContext.getPackageManager()) != null) {
                     mContext.startActivity(intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
