@@ -43,7 +43,7 @@ public class Utility {
 
     public static void pushNotification(Context context, double lat, double lng, double range, int severity) {
         final int mNotificationId = 1;
-        if (isAppOnForeground(context) && severity != 0) {
+        if (!isAppOnForeground(context) && severity != 0) {
             String selection = "ABS(" + IncidentsColumns.LAT + " - " + lat + ") <= " + range +
                     " AND ABS(" + IncidentsColumns.LNG + " - " + lng + ") <= " + range +
                     " AND " + IncidentsColumns.SEVERITY + " >= " + severity;
