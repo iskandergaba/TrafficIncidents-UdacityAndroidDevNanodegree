@@ -16,7 +16,6 @@ import android.util.Log;
 
 import com.gaba.alex.trafficincidents.Data.IncidentsColumns;
 import com.gaba.alex.trafficincidents.Data.IncidentsProvider;
-import com.gaba.alex.trafficincidents.paid.MainActivity;
 
 import org.json.JSONArray;
 import org.json.JSONException;

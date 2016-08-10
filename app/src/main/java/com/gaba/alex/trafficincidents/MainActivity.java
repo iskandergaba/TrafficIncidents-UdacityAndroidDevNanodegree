@@ -1,4 +1,4 @@
-package com.gaba.alex.trafficincidents.free;
+package com.gaba.alex.trafficincidents;
 
 import android.accounts.Account;
 import android.accounts.AccountManager;
@@ -16,10 +16,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.gaba.alex.trafficincidents.Data.IncidentsProvider;
-import com.gaba.alex.trafficincidents.R;
-import com.gaba.alex.trafficincidents.SettingsActivity;
-import com.google.android.gms.ads.AdRequest;
-import com.google.android.gms.ads.AdView;
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.common.GooglePlayServicesRepairableException;
 import com.google.android.gms.location.places.Place;
@@ -35,8 +31,8 @@ public class MainActivity extends AppCompatActivity {
     private final String PREF_LAT = "lat";
     private final String PREF_LNG = "lng";
     private final String PREF_ADDRESS = "address";
-    final String ACCOUNT_NAME = "Traffic Incidents";
-    final String ACCOUNT_TYPE = "com.gaba.alex.free.traffic_incidents";
+    private String mAccountName;
+    private String mAccountType;
     final String AUTHORITY = IncidentsProvider.AUTHORITY;
     private static final long SECONDS_PER_HOUR = 3600L;
     private double mLat;
@@ -45,12 +41,13 @@ public class MainActivity extends AppCompatActivity {
     private int mSeverity;
     private SharedPreferences.OnSharedPreferenceChangeListener mPreferencesListener;
     Account mAccount;
-    AdView mAdView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        mAccountName = getString(R.string.app_name);
+        mAccountType = getString(R.string.account_type);
         mAccount = createSyncAccount();
         configurePeriodicSync(mAccount);
         final SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
@@ -74,14 +71,6 @@ public class MainActivity extends AppCompatActivity {
         preferences.registerOnSharedPreferenceChangeListener(mPreferencesListener);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        mAdView = (AdView)findViewById(R.id.adView);
-        // Create an ad request. Check logcat output for the hashed device ID to
-        // get test ads on a physical device. e.g.
-        // "Use AdRequest.Builder.addTestDevice("ABCDEF012345") to get test ads on this device."
-        AdRequest adRequest = new AdRequest.Builder()
-                .addTestDevice(AdRequest.DEVICE_ID_EMULATOR)
-                .build();
-        mAdView.loadAd(adRequest);
         PlacePicker.IntentBuilder builder = new PlacePicker.IntentBuilder();
         String address = preferences.getString(PREF_ADDRESS, "Tap to choose a location");
         TextView addressTextView = (TextView)findViewById(R.id.address);
@@ -93,7 +82,6 @@ public class MainActivity extends AppCompatActivity {
         }
         mRange = Double.parseDouble(preferences.getString("prefSearchRange", "0.05"));
         mSeverity = Integer.parseInt(preferences.getString("prefNotifications", "4"));
-
 
         try {
             mPlacePickerIntent = builder.build(this);
@@ -158,7 +146,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private Account createSyncAccount() {
-        Account appAccount = new Account(ACCOUNT_NAME, ACCOUNT_TYPE);
+        Account appAccount = new Account(mAccountName, mAccountType);
         AccountManager accountManager = AccountManager.get(getApplicationContext());
         if (accountManager.addAccountExplicitly(appAccount, null, null)) {
             ContentResolver.setMasterSyncAutomatically(true);

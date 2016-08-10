@@ -1,4 +1,4 @@
-package com.gaba.alex.trafficincidents;
+package com.gaba.alex.trafficincidents.free;
 
 import android.app.Dialog;
 import android.content.DialogInterface;
@@ -19,6 +19,9 @@ import android.widget.ListView;
 import com.gaba.alex.trafficincidents.Adapter.IncidentsAdapter;
 import com.gaba.alex.trafficincidents.Data.IncidentsColumns;
 import com.gaba.alex.trafficincidents.Data.IncidentsProvider;
+import com.gaba.alex.trafficincidents.R;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.melnykov.fab.FloatingActionButton;
@@ -28,6 +31,7 @@ public class IncidentsFragment extends Fragment implements LoaderManager.LoaderC
     final String PREF_LAT = "lat";
     final String PREF_LNG = "lng";
     private IncidentsAdapter mAdapter;
+    AdView mAdView;
     SharedPreferences.OnSharedPreferenceChangeListener mPreferencesListener;
 
     @Override
@@ -44,6 +48,14 @@ public class IncidentsFragment extends Fragment implements LoaderManager.LoaderC
             }
         };
         preferences.registerOnSharedPreferenceChangeListener(mPreferencesListener);
+        mAdView = (AdView)rootView.findViewById(R.id.adView);
+        // Create an ad request. Check logcat output for the hashed device ID to
+        // get test ads on a physical device. e.g.
+        // "Use AdRequest.Builder.addTestDevice("ABCDEF012345") to get test ads on this device."
+        AdRequest adRequest = new AdRequest.Builder()
+                .addTestDevice(AdRequest.DEVICE_ID_EMULATOR)
+                .build();
+        mAdView.loadAd(adRequest);
         ListView mListView = (ListView) rootView.findViewById(R.id.list_view);
         mAdapter = new IncidentsAdapter(getActivity().getBaseContext(), R.layout.list_view_item, null);
         mListView.setAdapter(mAdapter);
