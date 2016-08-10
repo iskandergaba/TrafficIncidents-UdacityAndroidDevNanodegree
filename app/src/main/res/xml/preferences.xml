@@ -27,7 +27,7 @@
             android:summary="@string/pref_notifications_summary"
             android:entryValues="@array/notificationsLevelValues"
             android:title="@string/pref_notifications_title"
-            android:defaultValue="serious"/>
+            android:defaultValue="4"/>
     </PreferenceCategory>
 
 </PreferenceScreen>

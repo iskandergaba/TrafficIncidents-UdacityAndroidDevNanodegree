@@ -30,7 +30,6 @@ import com.melnykov.fab.FloatingActionButton;
 
 public class MainActivity extends AppCompatActivity {
 
-    AdView mAdView;
     private Intent mPlacePickerIntent;
     private final int PLACE_PICKER_REQUEST = 1;
     private final String PREF_LAT = "lat";
@@ -42,8 +41,11 @@ public class MainActivity extends AppCompatActivity {
     private static final long SECONDS_PER_HOUR = 3600L;
     private double mLat;
     private double mLng;
+    private double mRange;
+    private int mSeverity;
     private SharedPreferences.OnSharedPreferenceChangeListener mPreferencesListener;
     Account mAccount;
+    AdView mAdView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,11 +53,21 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         mAccount = createSyncAccount();
         configurePeriodicSync(mAccount);
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+        final SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
         mPreferencesListener = new SharedPreferences.OnSharedPreferenceChangeListener() {
             public void onSharedPreferenceChanged(SharedPreferences prefs, String key) {
-                if (key.equals("prefAutoRefresh")) {
-                    configurePeriodicSync(mAccount);
+                switch (key) {
+                    case "prefAutoRefresh":
+                        configurePeriodicSync(mAccount);
+                        break;
+                    case "prefNotifications":
+                        mSeverity = Integer.parseInt(preferences.getString("prefNotifications", "4"));
+                        configurePeriodicSync(mAccount);
+                        break;
+                    case "prefSearchRange":
+                        mRange = Double.parseDouble(preferences.getString("prefSearchRange", "0.05"));
+                        configurePeriodicSync(mAccount);
+                        break;
                 }
             }
         };
@@ -79,6 +91,8 @@ public class MainActivity extends AppCompatActivity {
             mLng = Double.parseDouble(preferences.getString(PREF_LNG, "0"));
             builder.setLatLngBounds(new LatLngBounds(new LatLng(mLat, mLng), new LatLng(mLat, mLng)));
         }
+        mRange = Double.parseDouble(preferences.getString("prefSearchRange", "0.05"));
+        mSeverity = Integer.parseInt(preferences.getString("prefNotifications", "4"));
 
 
         try {
@@ -138,6 +152,8 @@ public class MainActivity extends AppCompatActivity {
         settingsBundle.putBoolean(ContentResolver.SYNC_EXTRAS_EXPEDITED, true);
         settingsBundle.putDouble(PREF_LAT, mLat);
         settingsBundle.putDouble(PREF_LNG, mLng);
+        settingsBundle.putDouble("prefSearchRange", mRange);
+        settingsBundle.putInt("prefNotifications", mSeverity);
         ContentResolver.requestSync(mAccount, AUTHORITY, settingsBundle);
     }
 
@@ -153,12 +169,13 @@ public class MainActivity extends AppCompatActivity {
 
     private void configurePeriodicSync(Account appAccount) {
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
-        int hourlySyncInterval = Integer.parseInt(preferences.getString("prefAutoRefresh", 6 + ""));
-        long SyncInterval = hourlySyncInterval * SECONDS_PER_HOUR;
         Bundle settingsBundle = new Bundle();
         settingsBundle.putDouble(PREF_LAT, mLat);
         settingsBundle.putDouble(PREF_LNG, mLng);
-        ContentResolver.removePeriodicSync(appAccount, AUTHORITY, Bundle.EMPTY);
+        settingsBundle.putDouble("prefSearchRange", mRange);
+        settingsBundle.putInt("prefNotifications", mSeverity);
+        int hourlySyncInterval = Integer.parseInt(preferences.getString("prefAutoRefresh", "6"));
+        long SyncInterval = hourlySyncInterval * SECONDS_PER_HOUR;
         if (hourlySyncInterval > 0) {
             ContentResolver.addPeriodicSync(appAccount, AUTHORITY, settingsBundle, SyncInterval);
         }

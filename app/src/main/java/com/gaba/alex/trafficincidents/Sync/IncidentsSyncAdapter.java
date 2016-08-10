@@ -55,6 +55,12 @@ public class IncidentsSyncAdapter extends AbstractThreadedSyncAdapter {
         double lat = extras.getDouble(prefLat);
         String prefLng = "lng";
         double lng = extras.getDouble(prefLng);
+        String prefSeverity = "prefNotifications";
+        int severity = extras.getInt(prefSeverity);
+        String prefRange = "prefSearchRange";
+        double range = extras.getDouble(prefRange);
+
+
         String incidents = null;
         JSONArray incidentsJSON;
         HttpURLConnection urlConnection = null;
@@ -96,6 +102,8 @@ public class IncidentsSyncAdapter extends AbstractThreadedSyncAdapter {
                 incidentsJSON = new JSONObject(incidents).getJSONArray(BING_JSON_RESOURCE_SETS_KEY).getJSONObject(0).getJSONArray(BING_JSON_RESULTS_KEY);
                 int statusCode = new JSONObject(incidents).getInt("statusCode");
                 Utility.updateDatabase(getContext(), incidentsJSON, statusCode);
+                Utility.pushNotification(getContext(), lat, lng, range, severity);
+
             } catch (JSONException | NullPointerException |OperationApplicationException | RemoteException e) {
                 e.printStackTrace();
             }

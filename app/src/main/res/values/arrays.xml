@@ -30,16 +30,17 @@
 
     <string-array name="notificationsLevel">
         <item name="none">None</item>
-        <item name="minor">All the incidents</item>
+        <item name="low_impact">All the incidents</item>
         <item name="minor">Minor incidents and above</item>
         <item name="moderate">Moderate incidents and above</item>
         <item name="serious">Serious incidents only</item>
     </string-array>
     <string-array name="notificationsLevelValues">
-        <item name="none">none</item>
-        <item name="minor">minor</item>
-        <item name="moderate">moderate</item>
-        <item name="serious">serious</item>
+        <item name="none">0</item>
+        <item name="low_impact">1</item>
+        <item name="minor">2</item>
+        <item name="moderate">3</item>
+        <item name="serious">4</item>
     </string-array>
 
 </resources>

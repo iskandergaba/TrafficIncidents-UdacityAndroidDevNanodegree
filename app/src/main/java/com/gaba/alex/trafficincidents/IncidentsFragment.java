@@ -61,7 +61,7 @@ public class IncidentsFragment extends Fragment implements LoaderManager.LoaderC
         super.onDestroy();
     }
 
-    private void checkGooglePlayServices() {
+    private boolean checkGooglePlayServices() {
         GoogleApiAvailability apiAvailability = GoogleApiAvailability.getInstance();
         final int resultCode = apiAvailability.isGooglePlayServicesAvailable(getActivity());
         if (resultCode != ConnectionResult.SUCCESS) {
@@ -78,7 +78,9 @@ public class IncidentsFragment extends Fragment implements LoaderManager.LoaderC
                     });
                 }
             }
+            return false;
         }
+        return true;
     }
 
     private void restartLoader() {
@@ -92,7 +94,7 @@ public class IncidentsFragment extends Fragment implements LoaderManager.LoaderC
         double lng = Double.parseDouble(preferences.getString(PREF_LNG, "0"));
         double range = Double.parseDouble(preferences.getString("prefSearchRange", "0.05"));
         String selection = "ABS(" + IncidentsColumns.LAT + " - " +  lat + ") <= " + range +
-                " AND ABS(" + IncidentsColumns.LNG + " - " +  lng + ") <= " + range ;
+                " AND ABS(" + IncidentsColumns.LNG + " - " +  lng + ") <= " + range;
         Uri uri = IncidentsProvider.Incidents.CONTENT_URI;
         return new CursorLoader(getActivity(), uri, null, selection, null, IncidentsColumns.SEVERITY + " DESC");
     }
