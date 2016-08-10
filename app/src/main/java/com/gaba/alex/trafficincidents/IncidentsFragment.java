@@ -1,5 +1,7 @@
 package com.gaba.alex.trafficincidents;
 
+import android.app.Dialog;
+import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.Uri;
@@ -17,12 +19,12 @@ import android.widget.ListView;
 import com.gaba.alex.trafficincidents.Adapter.IncidentsAdapter;
 import com.gaba.alex.trafficincidents.Data.IncidentsColumns;
 import com.gaba.alex.trafficincidents.Data.IncidentsProvider;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GoogleApiAvailability;
 import com.melnykov.fab.FloatingActionButton;
 
-/**
- * A placeholder fragment containing a simple view.
- */
 public class IncidentsFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
+    private static final int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
     final String PREF_LAT = "lat";
     final String PREF_LNG = "lng";
     private IncidentsAdapter mAdapter;
@@ -32,6 +34,7 @@ public class IncidentsFragment extends Fragment implements LoaderManager.LoaderC
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_incidents, container, false);
+        checkGooglePlayServices();
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
         mPreferencesListener = new SharedPreferences.OnSharedPreferenceChangeListener() {
             public void onSharedPreferenceChanged(SharedPreferences prefs, String key) {
@@ -56,6 +59,26 @@ public class IncidentsFragment extends Fragment implements LoaderManager.LoaderC
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
         preferences.unregisterOnSharedPreferenceChangeListener(mPreferencesListener);
         super.onDestroy();
+    }
+
+    private void checkGooglePlayServices() {
+        GoogleApiAvailability apiAvailability = GoogleApiAvailability.getInstance();
+        final int resultCode = apiAvailability.isGooglePlayServicesAvailable(getActivity());
+        if (resultCode != ConnectionResult.SUCCESS) {
+            if (apiAvailability.isUserResolvableError(resultCode)) {
+                Dialog dialog = apiAvailability.getErrorDialog(getActivity(), resultCode, PLAY_SERVICES_RESOLUTION_REQUEST);
+                if (dialog != null) {
+                    dialog.show();
+                    dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+                        public void onDismiss(DialogInterface dialog) {
+                            if (ConnectionResult.SERVICE_INVALID == resultCode) {
+                                getActivity().finish();
+                            }
+                        }
+                    });
+                }
+            }
+        }
     }
 
     private void restartLoader() {
