@@ -1,5 +1,7 @@
 <resources>
 
+    <string name="app_name">@string/app_name</string>
+
     <string name="action_settings">Settings</string>
     <string name="action_refresh">Refresh</string>
 
@@ -14,5 +16,7 @@
 
     <string name="pref_general_settings">General Settings</string>
     <string name="pref_notification_settings">Notification Settings</string>
+
+    <string name="notification_content">Data updated. Traffic incidents detected.</string>
 
 </resources>

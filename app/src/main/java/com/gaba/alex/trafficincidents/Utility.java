@@ -8,11 +8,11 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.OperationApplicationException;
 import android.database.Cursor;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.RemoteException;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
-import android.util.Log;
 
 import com.gaba.alex.trafficincidents.Data.IncidentsColumns;
 import com.gaba.alex.trafficincidents.Data.IncidentsProvider;
@@ -43,36 +43,32 @@ public class Utility {
 
     public static void pushNotification(Context context, double lat, double lng, double range, int severity) {
         final int mNotificationId = 1;
-        if (Utility.isAppOnForeground(context) && severity != 0) {
+        if (isAppOnForeground(context) && severity != 0) {
             String selection = "ABS(" + IncidentsColumns.LAT + " - " + lat + ") <= " + range +
                     " AND ABS(" + IncidentsColumns.LNG + " - " + lng + ") <= " + range +
                     " AND " + IncidentsColumns.SEVERITY + " >= " + severity;
-            Log.v("fuck", selection);
             Uri uri = IncidentsProvider.Incidents.CONTENT_URI;
             Cursor cursor = context.getContentResolver().query(uri, null, selection, null, null);
 
             if (cursor != null && cursor.moveToFirst()) {
                 NotificationCompat.Builder mBuilder =
                         new NotificationCompat.Builder(context)
-                                .setSmallIcon(R.mipmap.ic_launcher)
-                                .setContentTitle("My notification")
-                                .setContentText("Hello World!");
-                if (BuildConfig.FREE_VERSION) {
-                    Intent mainIntent = new Intent(context, MainActivity.class);
-                    TaskStackBuilder stackBuilder = TaskStackBuilder.create(context);
-                    stackBuilder.addParentStack(MainActivity.class);
-                    stackBuilder.addNextIntent(mainIntent);
-                    PendingIntent resultPendingIntent =
-                            stackBuilder.getPendingIntent(
-                                    0,
-                                    PendingIntent.FLAG_UPDATE_CURRENT
-                            );
-                    mBuilder.setContentIntent(resultPendingIntent);
-                    NotificationManager mNotificationManager =
-                            (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-                    mNotificationManager.notify(mNotificationId, mBuilder.build());
-                    cursor.close();
-                }
+                                .setSmallIcon(android.R.drawable.stat_notify_sync)
+                                .setLargeIcon(BitmapFactory.decodeResource(context.getResources(), R.drawable.icon))
+                                .setContentTitle(context.getString(R.string.app_name))
+                                .setContentText(context.getString(R.string.notification_content))
+                                .setAutoCancel(true);
+                Intent mainIntent = new Intent(context, MainActivity.class);
+                TaskStackBuilder stackBuilder = TaskStackBuilder.create(context);
+                stackBuilder.addParentStack(MainActivity.class);
+                stackBuilder.addNextIntent(mainIntent);
+                PendingIntent resultPendingIntent =
+                        stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
+                mBuilder.setContentIntent(resultPendingIntent);
+                NotificationManager mNotificationManager =
+                        (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+                mNotificationManager.notify(mNotificationId, mBuilder.build());
+                cursor.close();
             }
         }
     }
