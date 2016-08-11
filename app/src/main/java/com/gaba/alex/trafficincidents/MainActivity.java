@@ -2,13 +2,16 @@ package com.gaba.alex.trafficincidents;
 
 import android.accounts.Account;
 import android.accounts.AccountManager;
+import android.app.Dialog;
 import android.content.ContentResolver;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -16,6 +19,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.gaba.alex.trafficincidents.Data.IncidentsProvider;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.common.GooglePlayServicesRepairableException;
 import com.google.android.gms.location.places.Place;
@@ -27,6 +32,7 @@ import com.melnykov.fab.FloatingActionButton;
 public class MainActivity extends AppCompatActivity {
 
     private Intent mPlacePickerIntent;
+    private static final int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
     private final int PLACE_PICKER_REQUEST = 1;
     private final String PREF_LAT = "lat";
     private final String PREF_LNG = "lng";
@@ -48,8 +54,8 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         mAccountName = getString(R.string.app_name);
         mAccountType = getString(R.string.account_type);
+        checkGooglePlayServices();
         mAccount = createSyncAccount();
-        configurePeriodicSync(mAccount);
         final SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
         mPreferencesListener = new SharedPreferences.OnSharedPreferenceChangeListener() {
             public void onSharedPreferenceChanged(SharedPreferences prefs, String key) {
@@ -69,12 +75,7 @@ public class MainActivity extends AppCompatActivity {
             }
         };
         preferences.registerOnSharedPreferenceChangeListener(mPreferencesListener);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
         PlacePicker.IntentBuilder builder = new PlacePicker.IntentBuilder();
-        String address = preferences.getString(PREF_ADDRESS, "Tap to choose a location");
-        TextView addressTextView = (TextView)findViewById(R.id.address);
-        addressTextView.setText(address);
         if (preferences.contains(PREF_LAT) && preferences.contains(PREF_LNG)) {
             mLat = Double.parseDouble(preferences.getString(PREF_LAT, "0"));
             mLng = Double.parseDouble(preferences.getString(PREF_LNG, "0"));
@@ -82,6 +83,12 @@ public class MainActivity extends AppCompatActivity {
         }
         mRange = Double.parseDouble(preferences.getString("prefSearchRange", "0.05"));
         mSeverity = Integer.parseInt(preferences.getString("prefNotifications", "4"));
+        configurePeriodicSync(mAccount);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        String address = preferences.getString(PREF_ADDRESS, "Tap to choose a location");
+        TextView addressTextView = (TextView)findViewById(R.id.address);
+        addressTextView.setText(address);
 
         try {
             mPlacePickerIntent = builder.build(this);
@@ -113,15 +120,17 @@ public class MainActivity extends AppCompatActivity {
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            startActivity(new Intent(this, SettingsActivity.class));
-            return true;
-        }
-
-        else if (id == R.id.action_refresh) {
-            refresh();
-            Toast.makeText(this, "Refreshing...", Toast.LENGTH_LONG).show();
-            return true;
+        switch (id) {
+            case R.id.action_settings:
+                startActivity(new Intent(this, SettingsActivity.class));
+                return true;
+            case R.id.action_refresh:
+                refresh();
+                Toast.makeText(this, "Refreshing...", Toast.LENGTH_LONG).show();
+                return true;
+            case R.id.action_about:
+                startActivity(new Intent(this, AboutActivity.class));
+                return true;
         }
 
         return super.onOptionsItemSelected(item);
@@ -132,6 +141,28 @@ public class MainActivity extends AppCompatActivity {
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
         preferences.unregisterOnSharedPreferenceChangeListener(mPreferencesListener);
         super.onDestroy();
+    }
+
+    private boolean checkGooglePlayServices() {
+        GoogleApiAvailability apiAvailability = GoogleApiAvailability.getInstance();
+        final int resultCode = apiAvailability.isGooglePlayServicesAvailable(this);
+        if (resultCode != ConnectionResult.SUCCESS) {
+            if (apiAvailability.isUserResolvableError(resultCode)) {
+                Dialog dialog = apiAvailability.getErrorDialog(this, resultCode, PLAY_SERVICES_RESOLUTION_REQUEST);
+                if (dialog != null) {
+                    dialog.show();
+                    dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+                        public void onDismiss(DialogInterface dialog) {
+                            if (ConnectionResult.SERVICE_INVALID == resultCode) {
+                                finish();
+                            }
+                        }
+                    });
+                }
+            }
+            return false;
+        }
+        return true;
     }
 
     public void refresh() {
@@ -147,7 +178,7 @@ public class MainActivity extends AppCompatActivity {
 
     private Account createSyncAccount() {
         Account appAccount = new Account(mAccountName, mAccountType);
-        AccountManager accountManager = AccountManager.get(getApplicationContext());
+        AccountManager accountManager = AccountManager.get(this);
         if (accountManager.addAccountExplicitly(appAccount, null, null)) {
             ContentResolver.setMasterSyncAutomatically(true);
             ContentResolver.setSyncAutomatically(appAccount, AUTHORITY, true);
@@ -162,8 +193,12 @@ public class MainActivity extends AppCompatActivity {
         settingsBundle.putDouble(PREF_LNG, mLng);
         settingsBundle.putDouble("prefSearchRange", mRange);
         settingsBundle.putInt("prefNotifications", mSeverity);
+        Log.v("fuck", mSeverity + "main");
         int hourlySyncInterval = Integer.parseInt(preferences.getString("prefAutoRefresh", "6"));
         long SyncInterval = hourlySyncInterval * SECONDS_PER_HOUR;
+        //for testing, replace with:
+        //long SyncInterval = 60L;
+        ContentResolver.removePeriodicSync(appAccount, AUTHORITY, settingsBundle);
         if (hourlySyncInterval > 0) {
             ContentResolver.addPeriodicSync(appAccount, AUTHORITY, settingsBundle, SyncInterval);
         }

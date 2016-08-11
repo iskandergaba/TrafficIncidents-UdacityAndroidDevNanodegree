@@ -13,6 +13,7 @@ import android.net.Uri;
 import android.os.RemoteException;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
+import android.util.Log;
 
 import com.gaba.alex.trafficincidents.Data.IncidentsColumns;
 import com.gaba.alex.trafficincidents.Data.IncidentsProvider;
@@ -41,6 +42,7 @@ public class Utility {
 
     public static void pushNotification(Context context, double lat, double lng, double range, int severity) {
         final int mNotificationId = 1;
+        Log.v("fuck", severity + "util");
         if (!isAppOnForeground(context) && severity != 0) {
             String selection = "ABS(" + IncidentsColumns.LAT + " - " + lat + ") <= " + range +
                     " AND ABS(" + IncidentsColumns.LNG + " - " + lng + ") <= " + range +
@@ -52,7 +54,7 @@ public class Utility {
                 NotificationCompat.Builder mBuilder =
                         new NotificationCompat.Builder(context)
                                 .setSmallIcon(android.R.drawable.stat_notify_sync)
-                                .setLargeIcon(BitmapFactory.decodeResource(context.getResources(), R.drawable.icon))
+                                .setLargeIcon(BitmapFactory.decodeResource(context.getResources(), R.drawable.playstore_icon))
                                 .setContentTitle(context.getString(R.string.app_name))
                                 .setContentText(context.getString(R.string.notification_content))
                                 .setAutoCancel(true);

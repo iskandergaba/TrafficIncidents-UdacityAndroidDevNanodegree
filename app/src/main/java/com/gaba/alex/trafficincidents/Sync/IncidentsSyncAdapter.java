@@ -55,12 +55,11 @@ public class IncidentsSyncAdapter extends AbstractThreadedSyncAdapter {
         double lat = extras.getDouble(prefLat);
         String prefLng = "lng";
         double lng = extras.getDouble(prefLng);
-        String prefSeverity = "prefNotifications";
-        int severity = extras.getInt(prefSeverity);
         String prefRange = "prefSearchRange";
         double range = extras.getDouble(prefRange);
-
-
+        String prefSeverity = "prefNotifications";
+        int severity = extras.getInt(prefSeverity);
+        Log.v("fuck", severity + "sync");
         String incidents = null;
         JSONArray incidentsJSON;
         HttpURLConnection urlConnection = null;
