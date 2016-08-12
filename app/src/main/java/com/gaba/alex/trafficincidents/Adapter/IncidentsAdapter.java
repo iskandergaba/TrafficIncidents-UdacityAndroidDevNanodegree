@@ -4,7 +4,6 @@ package com.gaba.alex.trafficincidents.Adapter;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
-import android.net.Uri;
 import android.support.v4.widget.SimpleCursorAdapter;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,6 +13,7 @@ import android.widget.TextView;
 
 import com.gaba.alex.trafficincidents.Data.IncidentsColumns;
 import com.gaba.alex.trafficincidents.R;
+import com.gaba.alex.trafficincidents.Utility;
 
 import java.text.DateFormat;
 import java.util.Date;
@@ -21,24 +21,19 @@ import java.util.Date;
 public class IncidentsAdapter extends SimpleCursorAdapter {
 
     private Context mContext;
-    private int layout;
-    private final LayoutInflater inflater;
-
-    private final String[] TYPE_CODES = {"Accident", "Congestion", "Disabled Vehicle",
-            "Mass Transit", "Miscellaneous", "Other News", "Planned Event","Road Hazard",
-            "Construction", "Alert", "Weather"};
-    private final String[] SEVERITY_CODES = {"Low Impact", "Minor", "Moderate", "Serious"};
+    private int mLayout;
+    private final LayoutInflater mInflater;
 
     public IncidentsAdapter(Context context, int layout, Cursor c) {
         super(context, layout, c, new String[0], new int[0], 0);
-        this.layout = layout;
-        this.mContext = context;
-        this.inflater = LayoutInflater.from(context);
+        mLayout = layout;
+        mContext = context;
+        mInflater = LayoutInflater.from(context);
     }
 
     @Override
     public View newView (Context context, Cursor cursor, ViewGroup parent) {
-        return inflater.inflate(layout, null);
+        return mInflater.inflate(mLayout, null);
     }
 
     @Override
@@ -56,12 +51,12 @@ public class IncidentsAdapter extends SimpleCursorAdapter {
 
         TextView typeTextView = (TextView) view.findViewById(R.id.incident_type);
         if (typeTextView != null) {
-            typeTextView.setText(TYPE_CODES[type - 1]);
+            typeTextView.setText(Utility.getIncidentType(type));
         }
 
         TextView severityTextView = (TextView) view.findViewById(R.id.incident_severity);
         if (severityTextView != null) {
-            severityTextView.setText(SEVERITY_CODES[severity - 1]);
+            severityTextView.setText(Utility.getIncidentSeverity(severity));
         }
 
         TextView roadClosedTextView = (TextView) view.findViewById(R.id.incident_road_closed);
@@ -86,14 +81,12 @@ public class IncidentsAdapter extends SimpleCursorAdapter {
         showOnMapImageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(Intent.ACTION_VIEW);
-                intent.setData(Uri.parse(String.format("geo:%s,%s", lat, lng)));
+                Intent intent = Utility.buildShowOnMapIntent(lat, lng);
                 if (intent.resolveActivity(context.getPackageManager()) != null) {
                     context.startActivity(intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
                 }
             }
         });
-
 
         ImageView shareImageView = (ImageView) view.findViewById(R.id.share_button);
         shareImageView.setOnClickListener(new View.OnClickListener() {
@@ -101,17 +94,14 @@ public class IncidentsAdapter extends SimpleCursorAdapter {
             public void onClick(View view) {
                 Intent intent = new Intent(Intent.ACTION_SEND);
                 intent.setType("text/plain");
-                String shareText = TYPE_CODES[type - 1] + "\n\n" + description + "\n\nSeverity: "
-                        + SEVERITY_CODES[severity - 1] + "\n\nRoad closed: " +
+                String shareText = Utility.getIncidentType(type) + "\n\n" + description + "\n\nSeverity: "
+                        + Utility.getIncidentSeverity(severity) + "\n\nRoad closed: " +
                         (roadClosed ?  "Yes" : "No") + "\n\nInformation provided by: " + context.getString(R.string.app_name);
                 intent.putExtra(Intent.EXTRA_TEXT, shareText);
                 if (intent.resolveActivity(mContext.getPackageManager()) != null) {
                     mContext.startActivity(intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
                 }
-
             }
         });
-
     }
-
 }

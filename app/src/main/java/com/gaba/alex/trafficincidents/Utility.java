@@ -31,6 +31,8 @@ import java.util.List;
 
 public class Utility {
 
+
+
     public static void updateDatabase(Context context, JSONArray incidents, int statusCode) throws JSONException, RemoteException, OperationApplicationException {
 
         if (statusCode == 200) {
@@ -47,6 +49,24 @@ public class Utility {
     public static void updateSettings(Context context) throws RemoteException, OperationApplicationException {
         context.getContentResolver().delete(IncidentsProvider.Settings.CONTENT_URI, null, null);
         context.getContentResolver().insert(IncidentsProvider.Settings.CONTENT_URI, buildSettingsValues(context));
+    }
+
+    public static String getIncidentType(int type) {
+        final String[] typeCodes = {"Accident", "Congestion", "Disabled Vehicle",
+                "Mass Transit", "Miscellaneous", "Other News", "Planned Event",
+                "Road Hazard", "Construction", "Alert", "Weather"};
+        return typeCodes[type - 1];
+    }
+
+    public static String getIncidentSeverity(int severity) {
+        final String[] severityCodes = {"Low Impact", "Minor", "Moderate", "Serious"};
+        return severityCodes[severity - 1];
+    }
+
+    public static Intent buildShowOnMapIntent(double lat, double lng) {
+        Intent intent = new Intent(Intent.ACTION_VIEW);
+        intent.setData(Uri.parse(String.format("geo:%s,%s", lat, lng)));
+        return intent;
     }
 
     public static void pushNotification(Context context, double lat, double lng, double range, int severity) {
