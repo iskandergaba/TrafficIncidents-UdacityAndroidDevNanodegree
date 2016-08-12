@@ -50,11 +50,11 @@ public class IncidentsFragment extends Fragment implements LoaderManager.LoaderC
                 .addTestDevice(AdRequest.DEVICE_ID_EMULATOR)
                 .build();
         mAdView.loadAd(adRequest);
-        ListView mListView = (ListView) rootView.findViewById(R.id.list_view);
+        ListView listView = (ListView) rootView.findViewById(R.id.list_view);
         mAdapter = new IncidentsAdapter(getActivity().getBaseContext(), R.layout.list_view_item, null);
-        mListView.setAdapter(mAdapter);
+        listView.setAdapter(mAdapter);
         FloatingActionButton fab = (FloatingActionButton)rootView.findViewById(R.id.fab);
-        fab.attachToListView(mListView);
+        fab.attachToListView(listView);
 
         getActivity().getSupportLoaderManager().initLoader(0, null, this);
         return rootView;
