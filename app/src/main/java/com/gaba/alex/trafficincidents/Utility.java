@@ -4,19 +4,23 @@ import android.app.ActivityManager;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.ContentProviderOperation;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.OperationApplicationException;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.RemoteException;
+import android.preference.PreferenceManager;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
 import android.util.Log;
 
 import com.gaba.alex.trafficincidents.Data.IncidentsColumns;
 import com.gaba.alex.trafficincidents.Data.IncidentsProvider;
+import com.gaba.alex.trafficincidents.Data.SettingsColumns;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -38,6 +42,11 @@ public class Utility {
             }
             context.getContentResolver().applyBatch(IncidentsProvider.AUTHORITY, batchOperations);
         }
+    }
+
+    public static void updateSettings(Context context) throws RemoteException, OperationApplicationException {
+        context.getContentResolver().delete(IncidentsProvider.Settings.CONTENT_URI, null, null);
+        context.getContentResolver().insert(IncidentsProvider.Settings.CONTENT_URI, buildSettingsValues(context));
     }
 
     public static void pushNotification(Context context, double lat, double lng, double range, int severity) {
@@ -73,7 +82,7 @@ public class Utility {
         }
     }
 
-    private static boolean isAppOnForeground(Context context){
+    private static boolean isAppOnForeground(Context context) {
 
         ActivityManager activityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
         List<ActivityManager.RunningAppProcessInfo> appProcesses = activityManager.getRunningAppProcesses();
@@ -87,6 +96,21 @@ public class Utility {
             }
         }
         return false;
+    }
+
+    private static ContentValues buildSettingsValues(Context context) {
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+        ContentValues values = new ContentValues();double lat = Double.parseDouble(preferences.getString("lat", "0"));
+        double lng = Double.parseDouble(preferences.getString("lng", "0"));
+        double range = Double.parseDouble(preferences.getString("prefSearchRange", "0.05"));
+        int severity = Integer.parseInt(preferences.getString("prefNotifications", "4"));
+        int autoRefresh= Integer.parseInt(preferences.getString("prefAutoRefresh", "6"));
+        values.put(SettingsColumns.LAT, lat);
+        values.put(SettingsColumns.LNG, lng);
+        values.put(SettingsColumns.RANGE, range);
+        values.put(SettingsColumns.SEVERITY, severity);
+        values.put(SettingsColumns.AUTO_REFRESH, autoRefresh);
+        return values;
     }
 
     private static ContentProviderOperation buildBatchOperation(JSONObject incident) {

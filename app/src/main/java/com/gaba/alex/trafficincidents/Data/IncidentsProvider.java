@@ -17,6 +17,7 @@ public class IncidentsProvider {
 
     interface Path {
         String INCIDENTS = "incidents";
+        String SETTINGS = "settings";
     }
 
     private static Uri buildUri(String... paths) {
@@ -34,5 +35,14 @@ public class IncidentsProvider {
                 type = "vnd.android.cursor.dir/incident"
         )
         public static final Uri CONTENT_URI = buildUri(Path.INCIDENTS);
+    }
+
+    @TableEndpoint(table = IncidentsDatabase.SETTINGS)
+    public static class Settings {
+        @ContentUri(
+                path = Path.SETTINGS,
+                type = "vnd.android.cursor.dir/setting"
+        )
+        public static final Uri CONTENT_URI = buildUri(Path.SETTINGS);
     }
 }

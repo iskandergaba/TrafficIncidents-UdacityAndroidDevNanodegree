@@ -3,14 +3,17 @@ package com.gaba.alex.trafficincidents.Sync;
 import android.accounts.Account;
 import android.content.AbstractThreadedSyncAdapter;
 import android.content.ContentProviderClient;
-import android.content.ContentResolver;
 import android.content.Context;
 import android.content.OperationApplicationException;
 import android.content.SyncResult;
+import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.RemoteException;
 import android.util.Log;
 
+import com.gaba.alex.trafficincidents.Data.IncidentsProvider;
+import com.gaba.alex.trafficincidents.Data.SettingsColumns;
 import com.gaba.alex.trafficincidents.Utility;
 
 import org.json.JSONArray;
@@ -24,42 +27,36 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
-/**
- * Handle the transfer of data between a server and an
- * app, using the Android sync adapter framework.
- */
 public class IncidentsSyncAdapter extends AbstractThreadedSyncAdapter {
-    // Global variables
-    // Define a variable to contain a content resolver instance
-    ContentResolver mContentResolver;
+
     public static final String BING_BASE_URL = "http://dev.virtualearth.net/REST/v1/Traffic/Incidents/";
     public static final String BING_API_KEY = "AusV2rdtPYqC440CZ4DV4GPUWv7tP8CSDdvATkk-bpChyUEw440vsCiOAkBj1Do0";
     public static final String BING_JSON_RESOURCE_SETS_KEY = "resourceSets";
     public static final String BING_JSON_RESULTS_KEY = "resources";
 
-    /**
-     * Set up the sync adapter
-     */
+
     public IncidentsSyncAdapter(Context context, boolean autoInitialize) {
         super(context, autoInitialize);
-        /*
-         * If your app uses a content resolver, get an instance of it
-         * from the incoming Context
-         */
-        mContentResolver = context.getContentResolver();
     }
 
     @Override
     public void onPerformSync(Account account, Bundle extras, String authority, ContentProviderClient provider, SyncResult syncResult) {
-        String prefLat = "lat";
-        double lat = extras.getDouble(prefLat);
-        String prefLng = "lng";
-        double lng = extras.getDouble(prefLng);
-        String prefRange = "prefSearchRange";
-        double range = extras.getDouble(prefRange);
-        String prefSeverity = "prefNotifications";
-        int severity = extras.getInt(prefSeverity);
-        Log.v("fuck", severity + "sync");
+
+        double lat = 0;
+        double lng = 0;
+        double range = 0.05;
+        int severity = 4;
+
+        Uri uri = IncidentsProvider.Settings.CONTENT_URI;
+        Cursor cursor = getContext().getContentResolver().query(uri, null, null, null, null);
+        if (cursor != null && cursor.moveToFirst()) {
+            lat = cursor.getDouble(cursor.getColumnIndex(SettingsColumns.LAT));
+            lng = cursor.getDouble(cursor.getColumnIndex(SettingsColumns.LNG));
+            range = cursor.getDouble(cursor.getColumnIndex(SettingsColumns.RANGE));
+            severity = cursor.getInt(cursor.getColumnIndex(SettingsColumns.SEVERITY));
+            cursor.close();
+        }
+
         String incidents = null;
         JSONArray incidentsJSON;
         HttpURLConnection urlConnection = null;
@@ -98,7 +95,10 @@ public class IncidentsSyncAdapter extends AbstractThreadedSyncAdapter {
             }
 
             try {
-                incidentsJSON = new JSONObject(incidents).getJSONArray(BING_JSON_RESOURCE_SETS_KEY).getJSONObject(0).getJSONArray(BING_JSON_RESULTS_KEY);
+                incidentsJSON = new JSONObject(incidents)
+                        .getJSONArray(BING_JSON_RESOURCE_SETS_KEY)
+                        .getJSONObject(0)
+                        .getJSONArray(BING_JSON_RESULTS_KEY);
                 int statusCode = new JSONObject(incidents).getInt("statusCode");
                 Utility.updateDatabase(getContext(), incidentsJSON, statusCode);
                 Utility.pushNotification(getContext(), lat, lng, range, severity);

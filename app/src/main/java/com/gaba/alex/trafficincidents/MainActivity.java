@@ -6,8 +6,10 @@ import android.app.Dialog;
 import android.content.ContentResolver;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.OperationApplicationException;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.RemoteException;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -41,10 +43,6 @@ public class MainActivity extends AppCompatActivity {
     private String mAccountType;
     final String AUTHORITY = IncidentsProvider.AUTHORITY;
     private static final long SECONDS_PER_HOUR = 3600L;
-    private double mLat;
-    private double mLng;
-    private double mRange;
-    private int mSeverity;
     private SharedPreferences.OnSharedPreferenceChangeListener mPreferencesListener;
     Account mAccount;
 
@@ -55,34 +53,33 @@ public class MainActivity extends AppCompatActivity {
         mAccountName = getString(R.string.app_name);
         mAccountType = getString(R.string.account_type);
         checkGooglePlayServices();
+        try {
+            Utility.updateSettings(getApplicationContext());
+        } catch (RemoteException | OperationApplicationException e) {
+            e.printStackTrace();
+        }
         mAccount = createSyncAccount();
         final SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
         mPreferencesListener = new SharedPreferences.OnSharedPreferenceChangeListener() {
             public void onSharedPreferenceChanged(SharedPreferences prefs, String key) {
-                switch (key) {
-                    case "prefAutoRefresh":
-                        configurePeriodicSync(mAccount);
-                        break;
-                    case "prefNotifications":
-                        mSeverity = Integer.parseInt(preferences.getString("prefNotifications", "4"));
-                        configurePeriodicSync(mAccount);
-                        break;
-                    case "prefSearchRange":
-                        mRange = Double.parseDouble(preferences.getString("prefSearchRange", "0.05"));
-                        configurePeriodicSync(mAccount);
-                        break;
+                if (key.equals("lat") || key.equals("lng")) {
+                    try {
+                        Utility.updateSettings(getApplicationContext());
+                    } catch (RemoteException | OperationApplicationException e) {
+                        e.printStackTrace();
+                    }
+                } else if (key.equals("prefAutoRefresh")) {
+                    configurePeriodicSync(mAccount);
                 }
             }
         };
         preferences.registerOnSharedPreferenceChangeListener(mPreferencesListener);
         PlacePicker.IntentBuilder builder = new PlacePicker.IntentBuilder();
         if (preferences.contains(PREF_LAT) && preferences.contains(PREF_LNG)) {
-            mLat = Double.parseDouble(preferences.getString(PREF_LAT, "0"));
-            mLng = Double.parseDouble(preferences.getString(PREF_LNG, "0"));
-            builder.setLatLngBounds(new LatLngBounds(new LatLng(mLat, mLng), new LatLng(mLat, mLng)));
+            double lat = Double.parseDouble(preferences.getString(PREF_LAT, "0"));
+            double lng = Double.parseDouble(preferences.getString(PREF_LNG, "0"));
+            builder.setLatLngBounds(new LatLngBounds(new LatLng(lat, lng), new LatLng(lat, lng)));
         }
-        mRange = Double.parseDouble(preferences.getString("prefSearchRange", "0.05"));
-        mSeverity = Integer.parseInt(preferences.getString("prefNotifications", "4"));
         configurePeriodicSync(mAccount);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -107,19 +104,13 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
         switch (id) {
             case R.id.action_settings:
                 startActivity(new Intent(this, SettingsActivity.class));
@@ -132,8 +123,41 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(new Intent(this, AboutActivity.class));
                 return true;
         }
-
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == PLACE_PICKER_REQUEST) {
+
+            SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+            if (resultCode == RESULT_OK) {
+                Place selectedPlace = PlacePicker.getPlace(this, data);
+                double newLat = selectedPlace.getLatLng().latitude;
+                double newLng = selectedPlace.getLatLng().longitude;
+                double lat = Double.parseDouble(preferences.getString(PREF_LAT, "0"));
+                double lng = Double.parseDouble(preferences.getString(PREF_LNG, "0"));
+                if (newLat != lat || newLng != lng) {
+                    SharedPreferences.Editor editor = preferences.edit();
+                    editor.putString(PREF_LAT, newLat + "");
+                    editor.putString(PREF_LNG, newLng + "");
+                    editor.putString(PREF_ADDRESS, selectedPlace.getAddress().toString());
+                    editor.apply();
+                    PlacePicker.IntentBuilder builder = new PlacePicker.IntentBuilder();
+                    String address = preferences.getString(PREF_ADDRESS, "Tap to choose a location");
+                    TextView addressTextView = (TextView)findViewById(R.id.address);
+                    addressTextView.setText(address);
+                    builder.setLatLngBounds(new LatLngBounds(new LatLng(newLat, newLng), new LatLng(newLat, newLng)));
+                    try {
+                        mPlacePickerIntent = builder.build(this);
+                    } catch (GooglePlayServicesRepairableException | GooglePlayServicesNotAvailableException e) {
+                        e.printStackTrace();
+                    }
+                    refresh();
+                }
+
+            }
+        }
     }
 
     @Override
@@ -165,17 +189,6 @@ public class MainActivity extends AppCompatActivity {
         return true;
     }
 
-    public void refresh() {
-        Bundle settingsBundle = new Bundle();
-        settingsBundle.putBoolean(ContentResolver.SYNC_EXTRAS_MANUAL, true);
-        settingsBundle.putBoolean(ContentResolver.SYNC_EXTRAS_EXPEDITED, true);
-        settingsBundle.putDouble(PREF_LAT, mLat);
-        settingsBundle.putDouble(PREF_LNG, mLng);
-        settingsBundle.putDouble("prefSearchRange", mRange);
-        settingsBundle.putInt("prefNotifications", mSeverity);
-        ContentResolver.requestSync(mAccount, AUTHORITY, settingsBundle);
-    }
-
     private Account createSyncAccount() {
         Account appAccount = new Account(mAccountName, mAccountType);
         AccountManager accountManager = AccountManager.get(this);
@@ -186,54 +199,25 @@ public class MainActivity extends AppCompatActivity {
         return appAccount;
     }
 
-    private void configurePeriodicSync(Account appAccount) {
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+    private void refresh() {
         Bundle settingsBundle = new Bundle();
-        settingsBundle.putDouble(PREF_LAT, mLat);
-        settingsBundle.putDouble(PREF_LNG, mLng);
-        settingsBundle.putDouble("prefSearchRange", mRange);
-        settingsBundle.putInt("prefNotifications", mSeverity);
-        Log.v("fuck", mSeverity + "main");
-        int hourlySyncInterval = Integer.parseInt(preferences.getString("prefAutoRefresh", "6"));
-        long SyncInterval = hourlySyncInterval * SECONDS_PER_HOUR;
-        //for testing, replace with:
-        //long SyncInterval = 60L;
-        ContentResolver.removePeriodicSync(appAccount, AUTHORITY, settingsBundle);
-        if (hourlySyncInterval > 0) {
-            ContentResolver.addPeriodicSync(appAccount, AUTHORITY, settingsBundle, SyncInterval);
-        }
+        settingsBundle.putBoolean(ContentResolver.SYNC_EXTRAS_MANUAL, true);
+        settingsBundle.putBoolean(ContentResolver.SYNC_EXTRAS_EXPEDITED, true);
+        ContentResolver.requestSync(mAccount, AUTHORITY, settingsBundle);
     }
 
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == PLACE_PICKER_REQUEST) {
-
-            SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
-            if (resultCode == RESULT_OK) {
-                Place selectedPlace = PlacePicker.getPlace(this, data);
-                double newLat = selectedPlace.getLatLng().latitude;
-                double newLng = selectedPlace.getLatLng().longitude;
-                if (newLat != mLat || newLng != mLng) {
-                    mLat = newLat;
-                    mLng = newLng;
-                    SharedPreferences.Editor editor = preferences.edit();
-                    editor.putString(PREF_LAT, newLat + "");
-                    editor.putString(PREF_LNG, newLng + "");
-                    editor.putString(PREF_ADDRESS, selectedPlace.getAddress().toString());
-                    editor.apply();
-                    PlacePicker.IntentBuilder builder = new PlacePicker.IntentBuilder();
-                    String address = preferences.getString(PREF_ADDRESS, "Location");
-                    TextView addressTextView = (TextView)findViewById(R.id.address);
-                    addressTextView.setText(address);
-                    builder.setLatLngBounds(new LatLngBounds(new LatLng(newLat, newLng), new LatLng(newLat, newLng)));
-                    try {
-                        mPlacePickerIntent = builder.build(this);
-                    } catch (GooglePlayServicesRepairableException | GooglePlayServicesNotAvailableException e) {
-                        e.printStackTrace();
-                    }
-                    refresh();
-                }
-
-            }
+    private void configurePeriodicSync(Account appAccount) {
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+        int hourlySyncInterval = Integer.parseInt(preferences.getString("prefAutoRefresh", "6"));
+        if (hourlySyncInterval == 0) {
+            ContentResolver.setSyncAutomatically(appAccount, AUTHORITY, false);
+        } else {
+            //for testing, replace with:
+            //long SyncInterval = 60L;
+            long syncInterval = hourlySyncInterval * SECONDS_PER_HOUR;
+            ContentResolver.setSyncAutomatically(appAccount, AUTHORITY, true);
+            ContentResolver.addPeriodicSync(appAccount, AUTHORITY, Bundle.EMPTY, syncInterval);
+            Log.v("fuck", syncInterval + "");
         }
     }
 }

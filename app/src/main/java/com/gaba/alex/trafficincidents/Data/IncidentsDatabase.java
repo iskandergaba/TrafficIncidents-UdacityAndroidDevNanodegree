@@ -7,7 +7,8 @@ import net.simonvt.schematic.annotation.Table;
 public class IncidentsDatabase {
     private IncidentsDatabase(){}
 
-    public static final int VERSION = 1;
+    public static final int VERSION = 2;
 
     @Table(IncidentsColumns.class) public static final String INCIDENTS = "incidents";
+    @Table(SettingsColumns.class) public static final String SETTINGS = "settings";
 }
