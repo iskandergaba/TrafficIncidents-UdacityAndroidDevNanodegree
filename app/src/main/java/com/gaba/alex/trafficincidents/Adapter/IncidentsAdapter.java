@@ -16,6 +16,7 @@ import com.gaba.alex.trafficincidents.R;
 import com.gaba.alex.trafficincidents.Utility;
 
 import java.text.DateFormat;
+import java.text.MessageFormat;
 import java.util.Date;
 
 public class IncidentsAdapter extends SimpleCursorAdapter {
@@ -46,29 +47,31 @@ public class IncidentsAdapter extends SimpleCursorAdapter {
         final double lng = cursor.getDouble(cursor.getColumnIndexOrThrow(IncidentsColumns.LNG));
         final long dateInMillis = Long.parseLong(cursor.getString(cursor.getColumnIndexOrThrow(IncidentsColumns.END_DATE)));
         final boolean roadClosed = Boolean.valueOf(cursor.getString(cursor.getColumnIndexOrThrow(IncidentsColumns.ROAD_CLOSED)));
-        final String description = "Local description: " +  cursor.getString(cursor.getColumnIndexOrThrow(IncidentsColumns.DESCRIPTION));
+        final String description = mContext.getString(R.string.local_description) + ": " + cursor.getString(cursor.getColumnIndexOrThrow(IncidentsColumns.DESCRIPTION));
 
 
         TextView typeTextView = (TextView) view.findViewById(R.id.incident_type);
         if (typeTextView != null) {
-            typeTextView.setText(Utility.getIncidentType(type));
+            typeTextView.setText(Utility.getIncidentType(mContext, type));
         }
 
         TextView severityTextView = (TextView) view.findViewById(R.id.incident_severity);
         if (severityTextView != null) {
-            severityTextView.setText(Utility.getIncidentSeverity(severity));
+            severityTextView.setText(Utility.getIncidentSeverity(mContext, severity));
         }
 
         TextView roadClosedTextView = (TextView) view.findViewById(R.id.incident_road_closed);
         if (roadClosedTextView != null) {
-            roadClosedTextView.setText("Road Closed: " + (roadClosed ? "Yes" : "No"));
+            roadClosedTextView.setText(MessageFormat.format("{0}{1}",
+                    mContext.getString(R.string.road_closed) + ": ",
+                    roadClosed ? mContext.getString(R.string.yes) : mContext.getString(R.string.no)));
         }
 
         TextView dateTextView = (TextView) view.findViewById(R.id.incident_update);
         if (dateTextView != null) {
             Date date = new Date(dateInMillis);
             DateFormat formatter = DateFormat.getInstance();
-            String dateStr = "Estimated end date: " + formatter.format(date);
+            String dateStr = mContext.getString(R.string.estimated_end_date) + ": " + formatter.format(date);
             dateTextView.setText(dateStr);
         }
 
@@ -94,9 +97,11 @@ public class IncidentsAdapter extends SimpleCursorAdapter {
             public void onClick(View view) {
                 Intent intent = new Intent(Intent.ACTION_SEND);
                 intent.setType("text/plain");
-                String shareText = Utility.getIncidentType(type) + "\n\n" + description + "\n\nSeverity: "
-                        + Utility.getIncidentSeverity(severity) + "\n\nRoad closed: " +
-                        (roadClosed ?  "Yes" : "No") + "\n\nInformation provided by: " + context.getString(R.string.app_name);
+                String shareText = Utility.getIncidentType(mContext, type) + "\n\n" + description + "\n\n"
+                        + mContext.getString(R.string.severity) + ": " + Utility.getIncidentSeverity(mContext, severity)
+                        + "\n\n" + mContext.getString(R.string.road_closed) + ": "
+                        + (roadClosed ?  mContext.getString(R.string.yes) : mContext.getString(R.string.no))
+                        + "\n\n" + mContext.getString(R.string.provided_by) + ": " + mContext.getString(R.string.app_name);
                 intent.putExtra(Intent.EXTRA_TEXT, shareText);
                 if (intent.resolveActivity(mContext.getPackageManager()) != null) {
                     mContext.startActivity(intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK));

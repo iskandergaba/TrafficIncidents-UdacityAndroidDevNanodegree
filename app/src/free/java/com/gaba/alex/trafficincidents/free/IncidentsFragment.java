@@ -36,7 +36,7 @@ public class IncidentsFragment extends Fragment implements LoaderManager.LoaderC
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
         mPreferencesListener = new SharedPreferences.OnSharedPreferenceChangeListener() {
             public void onSharedPreferenceChanged(SharedPreferences prefs, String key) {
-                if (key.equals("prefSearchRange") || key.equals(PREF_LAT) || key.equals(PREF_LNG)) {
+                if (key.equals(getString(R.string.pref_search_range_key)) || key.equals(PREF_LAT) || key.equals(PREF_LNG)) {
                     restartLoader();
                 }
             }
@@ -49,6 +49,7 @@ public class IncidentsFragment extends Fragment implements LoaderManager.LoaderC
         mAdView.loadAd(adRequest);
         ListView listView = (ListView) rootView.findViewById(R.id.list_view);
         mAdapter = new IncidentsAdapter(getActivity().getBaseContext(), R.layout.list_view_item, null);
+        listView.setEmptyView(rootView.findViewById(R.id.empty_view));
         listView.setAdapter(mAdapter);
         FloatingActionButton fab = (FloatingActionButton)rootView.findViewById(R.id.fab);
         fab.attachToListView(listView);
@@ -73,7 +74,7 @@ public class IncidentsFragment extends Fragment implements LoaderManager.LoaderC
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
         double lat = Double.parseDouble(preferences.getString(PREF_LAT, "0"));
         double lng = Double.parseDouble(preferences.getString(PREF_LNG, "0"));
-        double range = Double.parseDouble(preferences.getString("prefSearchRange", "0.05"));
+        double range = Double.parseDouble(preferences.getString(getString(R.string.pref_search_range_key), "0.05"));
         String selection = "ABS(" + IncidentsColumns.LAT + " - " +  lat + ") <= " + range +
                 " AND ABS(" + IncidentsColumns.LNG + " - " +  lng + ") <= " + range;
         Uri uri = IncidentsProvider.Incidents.CONTENT_URI;

@@ -14,7 +14,6 @@ import android.preference.PreferenceManager;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -70,13 +69,13 @@ public class MainActivity extends AppCompatActivity {
         final SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
         mPreferencesListener = new SharedPreferences.OnSharedPreferenceChangeListener() {
             public void onSharedPreferenceChanged(SharedPreferences prefs, String key) {
-                if (key.equals("lat") || key.equals("lng")) {
+                if (key.equals(PREF_LAT) || key.equals(PREF_LNG)) {
                     try {
                         Utility.updateSettings(getApplicationContext());
                     } catch (RemoteException | OperationApplicationException e) {
                         e.printStackTrace();
                     }
-                } else if (key.equals("prefAutoRefresh")) {
+                } else if (key.equals(getString(R.string.pref_auto_refresh_key))) {
                     configurePeriodicSync(mAccount);
                 }
             }
@@ -91,7 +90,7 @@ public class MainActivity extends AppCompatActivity {
         configurePeriodicSync(mAccount);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        String address = preferences.getString(PREF_ADDRESS, "Tap to choose a location");
+        String address = preferences.getString(PREF_ADDRESS, getString(R.string.select_location));
         TextView addressTextView = (TextView)findViewById(R.id.address);
         addressTextView.setText(address);
 
@@ -148,7 +147,7 @@ public class MainActivity extends AppCompatActivity {
                     editor.putString(PREF_ADDRESS, selectedPlace.getAddress().toString());
                     editor.apply();
                     PlacePicker.IntentBuilder builder = new PlacePicker.IntentBuilder();
-                    String address = preferences.getString(PREF_ADDRESS, "Tap to choose a location");
+                    String address = preferences.getString(PREF_ADDRESS, getString(R.string.select_location));
                     TextView addressTextView = (TextView)findViewById(R.id.address);
                     addressTextView.setText(address);
                     builder.setLatLngBounds(new LatLngBounds(new LatLng(newLat, newLng), new LatLng(newLat, newLng)));
@@ -212,16 +211,13 @@ public class MainActivity extends AppCompatActivity {
 
     private void configurePeriodicSync(Account appAccount) {
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
-        int hourlySyncInterval = Integer.parseInt(preferences.getString("prefAutoRefresh", "6"));
+        int hourlySyncInterval = Integer.parseInt(preferences.getString(getString(R.string.pref_auto_refresh_key), "6"));
         if (hourlySyncInterval == 0) {
             ContentResolver.setSyncAutomatically(appAccount, AUTHORITY, false);
         } else {
-            //for testing, replace with:
-            //long SyncInterval = 60L;
             long syncInterval = hourlySyncInterval * SECONDS_PER_HOUR;
             ContentResolver.setSyncAutomatically(appAccount, AUTHORITY, true);
             ContentResolver.addPeriodicSync(appAccount, AUTHORITY, Bundle.EMPTY, syncInterval);
-            Log.v("fuck", syncInterval + "");
         }
     }
 }

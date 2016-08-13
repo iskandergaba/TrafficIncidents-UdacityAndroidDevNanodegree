@@ -17,13 +17,13 @@ public class SettingsActivity extends AppCompatActivity {
         final SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
         mPreferencesListener = new SharedPreferences.OnSharedPreferenceChangeListener() {
             public void onSharedPreferenceChanged(SharedPreferences prefs, String key) {
-                if (key.equals("prefNotifications") || key.equals("prefAutoRefresh")) {
+                if (key.equals(getString(R.string.pref_notifications_key)) || key.equals(getString(R.string.pref_auto_refresh_key))) {
                     try {
                         Utility.updateSettings(getApplicationContext());
                     } catch (RemoteException | OperationApplicationException e) {
                         e.printStackTrace();
                     }
-                } else if (key.equals("prefSearchRange")) {
+                } else if (key.equals(getString(R.string.pref_search_range_key))) {
                     try {
                         Utility.updateSettings(getApplicationContext());
                         Utility.updateWidget(getApplicationContext());

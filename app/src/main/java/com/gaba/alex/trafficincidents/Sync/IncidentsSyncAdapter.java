@@ -33,7 +33,7 @@ public class IncidentsSyncAdapter extends AbstractThreadedSyncAdapter {
     public static final String BING_API_KEY = "AusV2rdtPYqC440CZ4DV4GPUWv7tP8CSDdvATkk-bpChyUEw440vsCiOAkBj1Do0";
     public static final String BING_JSON_RESOURCE_SETS_KEY = "resourceSets";
     public static final String BING_JSON_RESULTS_KEY = "resources";
-
+    public static final String BING_JSON_STATUS_CODE_KEY = "statusCode";
 
     public IncidentsSyncAdapter(Context context, boolean autoInitialize) {
         super(context, autoInitialize);
@@ -99,8 +99,8 @@ public class IncidentsSyncAdapter extends AbstractThreadedSyncAdapter {
                         .getJSONArray(BING_JSON_RESOURCE_SETS_KEY)
                         .getJSONObject(0)
                         .getJSONArray(BING_JSON_RESULTS_KEY);
-                int statusCode = new JSONObject(incidents).getInt("statusCode");
-                Utility.updateDatabase(getContext(), incidentsJSON, statusCode);
+                int statusCode = new JSONObject(incidents).getInt(BING_JSON_STATUS_CODE_KEY);
+                Utility.updateDatabase(getContext(), incidentsJSON, lat, lng, statusCode);
                 Utility.pushNotification(getContext(), lat, lng, range, severity);
                 Utility.updateWidget(getContext());
 

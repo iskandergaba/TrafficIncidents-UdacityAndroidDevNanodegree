@@ -30,7 +30,7 @@ public class IncidentsWidgetProvider extends AppWidgetProvider {
                 PendingIntent.FLAG_UPDATE_CURRENT);
         rv.setOnClickPendingIntent(R.id.widget_name, mainPendingIntent);
         rv.setPendingIntentTemplate(R.id.list_view_widget, showOnMapPendingIntent);
-        Intent adapter = new Intent(context, WidgetService.class);
+        Intent adapter = new Intent(context, IncidentsWidgetService.class);
         adapter.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
         rv.setRemoteAdapter(R.id.list_view_widget, adapter);
         rv.setEmptyView(R.id.list_view_widget, R.id.empty_view_widget);

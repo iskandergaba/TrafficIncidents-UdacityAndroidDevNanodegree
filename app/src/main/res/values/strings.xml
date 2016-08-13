@@ -17,8 +17,22 @@
     <string name="pref_auto_refresh_title">Auto refresh</string>
 
     <string name="pref_general_settings">General Settings</string>
-    <string name="pref_notification_settings">Notification Settings</string>
+    <string name="pref_notification_sync_settings">Refresh and Notification Settings</string>
 
-    <string name="notification_content">Data updated. Traffic incidents detected.</string>
+    <string name="notification_content">Data updated. Traffic incidents detected</string>
+
+    <string name="select_location">Tap to choose a location</string>
+    <string name="empty_list">No incidents found in the area</string>
+    <string name="road_closed">Road closed</string>
+    <string name="local_description">Local description</string>
+    <string name="estimated_end_date">Estimated end date</string>
+    <string name="severity">Severity</string>
+    <string name="provided_by">Provided by</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
+
+    <string name="pref_search_range_key" translatable="false">prefSearchRange</string>
+    <string name="pref_auto_refresh_key" translatable="false">prefAutoRefresh</string>
+    <string name="pref_notifications_key" translatable="false">prefNotifications</string>
 
 </resources>

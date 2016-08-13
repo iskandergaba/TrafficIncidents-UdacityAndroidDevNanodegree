@@ -43,4 +43,25 @@
         <item name="serious">4</item>
     </string-array>
 
+    <string-array name="incidentTypeCodes">
+        <item name="0">Accident</item>
+        <item name="1">Congestion</item>
+        <item name="2">Disabled Vehicle</item>
+        <item name="3">Mass Transit</item>
+        <item name="4">Miscellaneous</item>
+        <item name="5">Other News</item>
+        <item name="6">Planned Event</item>
+        <item name="7">Road Hazard</item>
+        <item name="8">Construction</item>
+        <item name="9">Alert</item>
+        <item name="10">Weather</item>
+    </string-array>
+
+    <string-array name="incidentSeverityCodes">
+    <item name="0">Low Impact</item>
+    <item name="1">Minor</item>
+    <item name="2">Moderate</item>
+    <item name="3">Serious</item>
+</string-array>
+
 </resources>

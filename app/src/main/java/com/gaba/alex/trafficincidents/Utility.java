@@ -18,7 +18,6 @@ import android.os.RemoteException;
 import android.preference.PreferenceManager;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
-import android.util.Log;
 
 import com.gaba.alex.trafficincidents.Data.IncidentsColumns;
 import com.gaba.alex.trafficincidents.Data.IncidentsProvider;
@@ -34,11 +33,19 @@ import java.util.List;
 
 public class Utility {
 
+    public static final String BING_JSON_POINT_KEY = "point";
+    public static final String BING_JSON_COORDINATES_KEY = "coordinates";
+    public static final String BING_JSON_TYPE_KEY = "type";
+    public static final String BING_JSON_SEVERITY_KEY = "severity";
+    public static final String BING_JSON_INCIDENT_ID_KEY = "incidentId";
+    public static final String BING_JSON_DESCRIPTION_KEY = "description";
+    public static final String BING_JSON_ROAD_CLOSED_KEY = "roadClosed";
+    public static final String BING_JSON_START_DATE_KEY = "start";
+    public static final String BING_JSON_END_DATE_KEY = "end";
 
+    public static void updateDatabase(Context context, JSONArray incidents, double lat, double lng, int statusCode) throws JSONException, RemoteException, OperationApplicationException {
 
-    public static void updateDatabase(Context context, JSONArray incidents, int statusCode) throws JSONException, RemoteException, OperationApplicationException {
-
-        if (statusCode == 200) {
+        if (statusCode == 200 && (lat != 0 || lng != 0)) {
             context.getContentResolver().delete(IncidentsProvider.Incidents.CONTENT_URI, null, null);
             ArrayList<ContentProviderOperation> batchOperations = new ArrayList<>();
             for (int i = 0; i < incidents.length(); i++) {
@@ -63,15 +70,13 @@ public class Utility {
         context.sendBroadcast(intent);
     }
 
-    public static String getIncidentType(int type) {
-        final String[] typeCodes = {"Accident", "Congestion", "Disabled Vehicle",
-                "Mass Transit", "Miscellaneous", "Other News", "Planned Event",
-                "Road Hazard", "Construction", "Alert", "Weather"};
+    public static String getIncidentType(Context context, int type) {
+        String[] typeCodes = context.getResources().getStringArray(R.array.incidentTypeCodes);
         return typeCodes[type - 1];
     }
 
-    public static String getIncidentSeverity(int severity) {
-        final String[] severityCodes = {"Low Impact", "Minor", "Moderate", "Serious"};
+    public static String getIncidentSeverity(Context context, int severity) {
+        final String[] severityCodes = context.getResources().getStringArray(R.array.incidentSeverityCodes);
         return severityCodes[severity - 1];
     }
 
@@ -83,7 +88,6 @@ public class Utility {
 
     public static void pushNotification(Context context, double lat, double lng, double range, int severity) {
         final int mNotificationId = 1;
-        Log.v("fuck", severity + "util");
         if (!isAppOnForeground(context) && severity != 0) {
             String selection = "ABS(" + IncidentsColumns.LAT + " - " + lat + ") <= " + range +
                     " AND ABS(" + IncidentsColumns.LNG + " - " + lng + ") <= " + range +
@@ -132,11 +136,12 @@ public class Utility {
 
     private static ContentValues buildSettingsValues(Context context) {
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
-        ContentValues values = new ContentValues();double lat = Double.parseDouble(preferences.getString("lat", "0"));
+        ContentValues values = new ContentValues();
+        double lat = Double.parseDouble(preferences.getString("lat", "0"));
         double lng = Double.parseDouble(preferences.getString("lng", "0"));
-        double range = Double.parseDouble(preferences.getString("prefSearchRange", "0.05"));
-        int severity = Integer.parseInt(preferences.getString("prefNotifications", "4"));
-        int autoRefresh= Integer.parseInt(preferences.getString("prefAutoRefresh", "6"));
+        double range = Double.parseDouble(preferences.getString(context.getString(R.string.pref_search_range_key), "0.05"));
+        int severity = Integer.parseInt(preferences.getString(context.getString(R.string.pref_notifications_key), "4"));
+        int autoRefresh= Integer.parseInt(preferences.getString(context.getString(R.string.pref_auto_refresh_key), "6"));
         values.put(SettingsColumns.LAT, lat);
         values.put(SettingsColumns.LNG, lng);
         values.put(SettingsColumns.RANGE, range);
@@ -148,15 +153,15 @@ public class Utility {
     private static ContentProviderOperation buildBatchOperation(JSONObject incident) {
         ContentProviderOperation.Builder builder = ContentProviderOperation.newInsert(IncidentsProvider.Incidents.CONTENT_URI);
         try {
-            double lat = incident.getJSONObject("point").getJSONArray("coordinates").getDouble(0);
-            double lng = incident.getJSONObject("point").getJSONArray("coordinates").getDouble(1);
-            int type = incident.getInt("type");
-            int severity = incident.getInt("severity");
-            String id = incident.getString("incidentId");
-            String description = incident.getString("description");
-            String roadClosed = incident.getString("roadClosed");
-            String startDateMillis = incident.getString("start");
-            String endDateMillis = incident.getString("end");
+            double lat = incident.getJSONObject(BING_JSON_POINT_KEY).getJSONArray(BING_JSON_COORDINATES_KEY).getDouble(0);
+            double lng = incident.getJSONObject(BING_JSON_POINT_KEY).getJSONArray(BING_JSON_COORDINATES_KEY).getDouble(1);
+            int type = incident.getInt(BING_JSON_TYPE_KEY);
+            int severity = incident.getInt(BING_JSON_SEVERITY_KEY);
+            String id = incident.getString(BING_JSON_INCIDENT_ID_KEY);
+            String description = incident.getString(BING_JSON_DESCRIPTION_KEY);
+            String roadClosed = incident.getString(BING_JSON_ROAD_CLOSED_KEY);
+            String startDateMillis = incident.getString(BING_JSON_START_DATE_KEY);
+            String endDateMillis = incident.getString(BING_JSON_END_DATE_KEY);
             startDateMillis = startDateMillis.substring(6, startDateMillis.length() - 2);
             endDateMillis = endDateMillis.substring(6, endDateMillis.length() - 2);
             builder.withValue(IncidentsColumns.LAT, lat);

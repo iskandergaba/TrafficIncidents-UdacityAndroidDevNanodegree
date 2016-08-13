@@ -1,3 +1,3 @@
 <resources>
-    <string name="content_authority">com.gaba.alex.trafficincidents.free.debug.provider</string>
+    <string name="content_authority" translatable="false">com.gaba.alex.trafficincidents.free.debug.provider</string>
 </resources>

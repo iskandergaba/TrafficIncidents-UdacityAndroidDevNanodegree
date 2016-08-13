@@ -14,12 +14,12 @@ import com.gaba.alex.trafficincidents.Data.SettingsColumns;
 import com.gaba.alex.trafficincidents.R;
 import com.gaba.alex.trafficincidents.Utility;
 
-public class WidgetListProvider implements RemoteViewsService.RemoteViewsFactory {
+public class IncidentsWidgetListProvider implements RemoteViewsService.RemoteViewsFactory {
     private Cursor mCursor;
     private Context mContext;
     int mWidgetId;
 
-    public WidgetListProvider(Context context, Intent intent) {
+    public IncidentsWidgetListProvider(Context context, Intent intent) {
         mContext = context;
         mWidgetId = intent.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, AppWidgetManager.INVALID_APPWIDGET_ID);
     }
@@ -31,7 +31,7 @@ public class WidgetListProvider implements RemoteViewsService.RemoteViewsFactory
             Intent intent = Utility.buildShowOnMapIntent(mCursor.getDouble(mCursor.getColumnIndex(IncidentsColumns.LAT)),
                     mCursor.getDouble(mCursor.getColumnIndex(IncidentsColumns.LNG)));
             rv.setTextViewText(R.id.incident_type_widget,
-                    Utility.getIncidentType(mCursor.getInt(mCursor.getColumnIndex(IncidentsColumns.TYPE))));
+                    Utility.getIncidentType(mContext, mCursor.getInt(mCursor.getColumnIndex(IncidentsColumns.TYPE))));
             rv.setTextViewText(R.id.incident_description_widget,
                     mCursor.getString(mCursor.getColumnIndex(IncidentsColumns.DESCRIPTION)));
             rv.setOnClickFillInIntent(R.id.show_on_map_button_widget, intent);
