@@ -3,6 +3,8 @@ package com.gaba.alex.trafficincidents;
 import android.app.ActivityManager;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.appwidget.AppWidgetManager;
+import android.content.ComponentName;
 import android.content.ContentProviderOperation;
 import android.content.ContentValues;
 import android.content.Context;
@@ -21,6 +23,7 @@ import android.util.Log;
 import com.gaba.alex.trafficincidents.Data.IncidentsColumns;
 import com.gaba.alex.trafficincidents.Data.IncidentsProvider;
 import com.gaba.alex.trafficincidents.Data.SettingsColumns;
+import com.gaba.alex.trafficincidents.Widget.IncidentsWidgetProvider;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -49,6 +52,15 @@ public class Utility {
     public static void updateSettings(Context context) throws RemoteException, OperationApplicationException {
         context.getContentResolver().delete(IncidentsProvider.Settings.CONTENT_URI, null, null);
         context.getContentResolver().insert(IncidentsProvider.Settings.CONTENT_URI, buildSettingsValues(context));
+    }
+
+    public static void updateWidget(Context context) {
+        Intent intent = new Intent(context, IncidentsWidgetProvider.class);
+        intent.setAction("android.appwidget.action.APPWIDGET_UPDATE");
+        ComponentName name = new ComponentName(context, IncidentsWidgetProvider.class);
+        int [] ids = AppWidgetManager.getInstance(context).getAppWidgetIds(name);
+        intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, ids);
+        context.sendBroadcast(intent);
     }
 
     public static String getIncidentType(int type) {

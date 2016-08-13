@@ -24,9 +24,12 @@ public class IncidentsWidgetProvider extends AppWidgetProvider {
                                 int appWidgetId) {
         RemoteViews rv = new RemoteViews(context.getPackageName(),
                 R.layout.widget_layout);
-        PendingIntent pendingIntent = PendingIntent.getActivity(context, 1, new Intent(context, MainActivity.class),
+        PendingIntent mainPendingIntent = PendingIntent.getActivity(context, 1, new Intent(context, MainActivity.class),
                 PendingIntent.FLAG_CANCEL_CURRENT);
-        rv.setOnClickPendingIntent(R.id.widget_name, pendingIntent);
+        PendingIntent showOnMapPendingIntent = PendingIntent.getActivity(context, 0, new Intent(),
+                PendingIntent.FLAG_UPDATE_CURRENT);
+        rv.setOnClickPendingIntent(R.id.widget_name, mainPendingIntent);
+        rv.setPendingIntentTemplate(R.id.list_view_widget, showOnMapPendingIntent);
         Intent adapter = new Intent(context, WidgetService.class);
         adapter.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
         rv.setRemoteAdapter(R.id.list_view_widget, adapter);

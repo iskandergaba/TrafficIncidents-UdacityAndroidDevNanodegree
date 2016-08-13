@@ -102,6 +102,7 @@ public class IncidentsSyncAdapter extends AbstractThreadedSyncAdapter {
                 int statusCode = new JSONObject(incidents).getInt("statusCode");
                 Utility.updateDatabase(getContext(), incidentsJSON, statusCode);
                 Utility.pushNotification(getContext(), lat, lng, range, severity);
+                Utility.updateWidget(getContext());
 
             } catch (JSONException | NullPointerException |OperationApplicationException | RemoteException e) {
                 e.printStackTrace();

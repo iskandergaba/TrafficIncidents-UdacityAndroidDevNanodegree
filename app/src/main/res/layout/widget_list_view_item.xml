@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/widget_row"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:paddingStart="@dimen/activity_vertical_margin"
@@ -18,7 +19,7 @@
             android:layout_height="wrap_content"
             android:paddingTop="@dimen/activity_horizontal_margin"
             android:fontFamily="sans-serif-condensed"
-            android:textAppearance="?android:textAppearanceLarge"
+            android:textAppearance="?android:textAppearanceLargeInverse"
 
             android:text="Construction"/>
 
@@ -27,7 +28,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:fontFamily="sans-serif-condensed"
-            android:textAppearance="?android:textAppearanceMedium"
+            android:textAppearance="?android:textAppearanceMediumInverse"
             android:text="Local description"/>
 
 
@@ -38,7 +39,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:src="@android:drawable/ic_dialog_map"
-        android:background="?attr/selectableItemBackgroundBorderless"
         android:clickable="true"
         android:tint="@color/colorAccent"
         android:contentDescription="View on Map"
@@ -46,6 +46,6 @@
         android:paddingLeft="@dimen/activity_vertical_margin"
         android:paddingRight="@dimen/activity_vertical_margin"
         android:paddingEnd="@dimen/activity_vertical_margin"
-        android:layout_gravity="center"/>
+        android:layout_gravity="center" />
 
 </LinearLayout>
