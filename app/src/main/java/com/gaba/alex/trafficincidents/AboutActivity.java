@@ -19,6 +19,8 @@ package com.gaba.alex.trafficincidents;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.method.LinkMovementMethod;
+import android.widget.TextView;
 
 public class AboutActivity extends AppCompatActivity {
 
@@ -31,6 +33,11 @@ public class AboutActivity extends AppCompatActivity {
         if (getSupportActionBar() != null) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }
+        TextView gitHubLink = (TextView)findViewById(R.id.github_link);
+        gitHubLink.setMovementMethod(LinkMovementMethod.getInstance());
+
+        TextView bingLink = (TextView)findViewById(R.id.bing_link);
+        bingLink.setMovementMethod(LinkMovementMethod.getInstance());
     }
 
     @Override

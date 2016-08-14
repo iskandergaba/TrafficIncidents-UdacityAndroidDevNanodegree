@@ -120,7 +120,7 @@ public class Utility {
                 NotificationCompat.Builder mBuilder =
                         new NotificationCompat.Builder(context)
                                 .setSmallIcon(android.R.drawable.stat_notify_sync)
-                                .setLargeIcon(BitmapFactory.decodeResource(context.getResources(), R.drawable.playstore_icon))
+                                .setLargeIcon(BitmapFactory.decodeResource(context.getResources(), R.drawable.ic_notification))
                                 .setContentTitle(context.getString(R.string.app_name))
                                 .setContentText(context.getString(R.string.notification_content))
                                 .setAutoCancel(true);

@@ -21,6 +21,12 @@
 
     <string name="notification_content">Data updated. Traffic incidents detected</string>
 
+    <string name="copyright">Copyright 2016 Iskander Gaba</string>
+    <string name="license">Licensed under the Apache License, Version 2.0.</string>
+    <string name="app_description">This app fetches and displays the incidents information that are occurring nearby a selected area using Google and Bing services.</string>
+    <string name="bing_link"><a href='https://msdn.microsoft.com/en-us/library/jj136866'>Bing Maps Traffic Coverage</a></string>
+    <string name="github_link"><a href='https://github.com/iskandergaba/Traffic-Incidents'>GitHub</a></string>
+
     <string name="location_address">Location address</string>
     <string name="show_on_map">Show on Map</string>
     <string name="share">Share</string>
@@ -33,6 +39,8 @@
     <string name="provided_by">Provided by</string>
     <string name="yes">Yes</string>
     <string name="no">No</string>
+    <string name="powered_by_google">Powered by Google</string>
+    <string name="powered_by_bing">Powered by Bing</string>
 
     <string name="pref_search_range_key" translatable="false">prefSearchRange</string>
     <string name="pref_auto_refresh_key" translatable="false">prefAutoRefresh</string>
