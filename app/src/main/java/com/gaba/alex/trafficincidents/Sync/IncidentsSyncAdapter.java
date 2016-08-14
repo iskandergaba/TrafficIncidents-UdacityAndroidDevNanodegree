@@ -10,7 +10,6 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.RemoteException;
-import android.util.Log;
 
 import com.gaba.alex.trafficincidents.Data.IncidentsProvider;
 import com.gaba.alex.trafficincidents.Data.SettingsColumns;
@@ -65,7 +64,6 @@ public class IncidentsSyncAdapter extends AbstractThreadedSyncAdapter {
             String link = BING_BASE_URL + (lat - 0.1) + "," + (lng + 0.1) + "," + (lat + 0.1) + "," + (lng - 0.1)
                     + "?key=" + BING_API_KEY;
             URL url = new URL(link);
-            Log.v("fuck", link);
             urlConnection = (HttpURLConnection) url.openConnection();
             urlConnection.setRequestMethod("GET");
             urlConnection.connect();

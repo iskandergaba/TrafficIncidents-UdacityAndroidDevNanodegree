@@ -20,7 +20,8 @@
         android:layout_gravity="center"
         android:text="@string/app_name"
         android:textAppearance="?android:textAppearanceLarge"
-        android:background="@color/colorPrimary" />
+        android:background="@color/colorPrimary"
+        android:elevation="4dp" />
 
     <FrameLayout
         android:layout_width="match_parent"

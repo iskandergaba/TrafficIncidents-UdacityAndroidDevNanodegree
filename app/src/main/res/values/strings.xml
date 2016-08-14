@@ -21,6 +21,7 @@
 
     <string name="notification_content">Data updated. Traffic incidents detected</string>
 
+    <string name="show_on_map">Show on Map</string>
     <string name="select_location">Tap to choose a location</string>
     <string name="empty_list">No incidents found in the area</string>
     <string name="road_closed">Road closed</string>
