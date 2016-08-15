@@ -84,6 +84,8 @@ public class IncidentsAdapter extends SimpleCursorAdapter {
         TextView roadClosedContentTextView = (TextView) view.findViewById(R.id.incident_road_closed_content);
         if (roadClosedContentTextView != null) {
             roadClosedContentTextView.setText(roadClosed ? mContext.getString(R.string.yes) : mContext.getString(R.string.no));
+            roadClosedContentTextView.setTextColor(ContextCompat.getColor(mContext,
+                    roadClosed ? android.R.color.holo_red_light : android.R.color.holo_green_dark));
         }
 
         TextView dateTextView = (TextView) view.findViewById(R.id.incident_end_date);
