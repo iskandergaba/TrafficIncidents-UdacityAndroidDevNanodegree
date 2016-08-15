@@ -45,7 +45,7 @@ import java.net.URL;
 public class IncidentsSyncAdapter extends AbstractThreadedSyncAdapter {
 
     public static final String BING_BASE_URL = "http://dev.virtualearth.net/REST/v1/Traffic/Incidents/";
-    public static final String BING_API_KEY = "AusV2rdtPYqC440CZ4DV4GPUWv7tP8CSDdvATkk-bpChyUEw440vsCiOAkBj1Do0";
+    public static final String BING_API_KEY = "BING_API_KEY";
     public static final String BING_JSON_RESOURCE_SETS_KEY = "resourceSets";
     public static final String BING_JSON_RESULTS_KEY = "resources";
     public static final String BING_JSON_STATUS_CODE_KEY = "statusCode";
