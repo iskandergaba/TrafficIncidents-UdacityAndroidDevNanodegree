@@ -31,11 +31,13 @@ import android.view.ViewGroup;
 import android.widget.ListView;
 
 import com.gaba.alex.trafficincidents.Adapter.IncidentsAdapter;
+import com.gaba.alex.trafficincidents.BuildConfig;
 import com.gaba.alex.trafficincidents.Data.IncidentsColumns;
 import com.gaba.alex.trafficincidents.Data.IncidentsProvider;
 import com.gaba.alex.trafficincidents.R;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
+import com.google.android.gms.ads.MobileAds;
 import com.melnykov.fab.FloatingActionButton;
 
 public class IncidentsFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
@@ -59,9 +61,17 @@ public class IncidentsFragment extends Fragment implements LoaderManager.LoaderC
         };
         preferences.registerOnSharedPreferenceChangeListener(mPreferencesListener);
         mAdView = (AdView)rootView.findViewById(R.id.adView);
-        AdRequest adRequest = new AdRequest.Builder()
-                .addTestDevice(AdRequest.DEVICE_ID_EMULATOR)
-                .build();
+        AdRequest adRequest;
+        if (BuildConfig.DEBUG) {
+            adRequest = new AdRequest.Builder()
+                    .addTestDevice(AdRequest.DEVICE_ID_EMULATOR)
+                    .build();
+        } else {
+            MobileAds.initialize(getActivity().getApplicationContext(), "ca-app-pub-2357277820030679~7651767747");
+            adRequest = new AdRequest.Builder()
+                    .build();
+        }
+
         mAdView.loadAd(adRequest);
         ListView listView = (ListView) rootView.findViewById(R.id.list_view);
         mAdapter = new IncidentsAdapter(getActivity().getBaseContext(), R.layout.list_view_item, null);
