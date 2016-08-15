@@ -1,5 +1,4 @@
 <resources>
     <string name="app_name">Traffic Incidents Pro</string>
-    <string name="account_type">com.gaba.alex.paid.traffic_incidents</string>
-    <string name="content_authority">com.gaba.alex.trafficincidents.paid.provider</string>
+    <string name="account_type" translatable="false">com.gaba.alex.paid.traffic_incidents</string>
 </resources>

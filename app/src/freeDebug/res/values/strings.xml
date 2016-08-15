@@ -1,3 +1,4 @@
 <resources>
     <string name="content_authority" translatable="false">com.gaba.alex.trafficincidents.free.debug.provider</string>
+    <string name="banner_ad_unit_id" translatable="false">ca-app-pub-3940256099942544/6300978111</string>
 </resources>

@@ -1,0 +1,3 @@
+<resources>
+    <string name="content_authority" translatable="false">com.gaba.alex.trafficincidents.paid.provider</string>
+</resources>

@@ -1,6 +1,4 @@
 <resources>
     <string name="app_name">Traffic Incidents</string>
     <string name="account_type" translatable="false">com.gaba.alex.free.traffic_incidents</string>
-    <string name="content_authority">com.gaba.alex.trafficincidents.free.provider</string>
-    <string name="banner_ad_unit_id" translatable="false">ca-app-pub-3940256099942544/6300978111</string>
 </resources>
