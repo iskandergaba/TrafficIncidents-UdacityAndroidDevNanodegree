@@ -35,6 +35,7 @@ import com.gaba.alex.trafficincidents.BuildConfig;
 import com.gaba.alex.trafficincidents.Data.IncidentsColumns;
 import com.gaba.alex.trafficincidents.Data.IncidentsProvider;
 import com.gaba.alex.trafficincidents.R;
+import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 import com.google.android.gms.ads.MobileAds;
@@ -67,11 +68,24 @@ public class IncidentsFragment extends Fragment implements LoaderManager.LoaderC
                     .addTestDevice(AdRequest.DEVICE_ID_EMULATOR)
                     .build();
         } else {
-            MobileAds.initialize(getActivity().getApplicationContext(), "ca-app-pub-2357277820030679~7651767747");
+            MobileAds.initialize(getActivity().getApplicationContext(), "APP_UNIT_ID");
             adRequest = new AdRequest.Builder()
                     .build();
         }
 
+        mAdView.setAdListener(new AdListener() {
+            @Override
+            public void onAdFailedToLoad(int i) {
+                mAdView.setVisibility(AdView.GONE);
+                super.onAdFailedToLoad(i);
+            }
+
+            @Override
+            public void onAdLoaded() {
+                mAdView.setVisibility(AdView.VISIBLE);
+                super.onAdLoaded();
+            }
+        });
         mAdView.loadAd(adRequest);
         ListView listView = (ListView) rootView.findViewById(R.id.list_view);
         mAdapter = new IncidentsAdapter(getActivity().getBaseContext(), R.layout.list_view_item, null);
