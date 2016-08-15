@@ -68,7 +68,7 @@ public class IncidentsFragment extends Fragment implements LoaderManager.LoaderC
                     .addTestDevice(AdRequest.DEVICE_ID_EMULATOR)
                     .build();
         } else {
-            MobileAds.initialize(getActivity().getApplicationContext(), "APP_UNIT_ID");
+            MobileAds.initialize(getActivity().getApplicationContext(), "ca-app-pub-2357277820030679~7651767747");
             adRequest = new AdRequest.Builder()
                     .build();
         }
