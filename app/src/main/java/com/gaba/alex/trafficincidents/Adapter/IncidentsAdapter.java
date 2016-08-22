@@ -112,9 +112,9 @@ public class IncidentsAdapter extends SimpleCursorAdapter {
         showOnMapImageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = Utility.buildShowOnMapIntent(lat, lng);
+                Intent intent = Utility.buildShowOnMapIntent(mContext, lat, lng, description);
                 if (intent.resolveActivity(mContext.getPackageManager()) != null) {
-                    mContext.startActivity(intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
+                    mContext.startActivity(intent);
                 }
             }
         });
