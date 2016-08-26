@@ -26,15 +26,16 @@ import net.simonvt.schematic.annotation.Table;
 public class IncidentsDatabase {
     private IncidentsDatabase(){}
 
-    public static final int VERSION = 3;
+    public static final int VERSION = 4;
 
     @Table(IncidentsColumns.class) public static final String INCIDENTS = "incidents";
     @Table(SettingsColumns.class) public static final String SETTINGS = "settings";
 
     public static final String[] _MIGRATIONS = {
-            "ALTER TABLE " + INCIDENTS + " ADD ( "
-                    + IncidentsColumns.TO_LAT + " REAL NOT NULL DEFAULT 0.0, "
-                    + IncidentsColumns.TO_LNG + " REAL NOT NULL DEFAULT 0.0)"
+            "ALTER TABLE " + INCIDENTS +
+                    "\nADD COLUMN " + IncidentsColumns.TO_LAT + " REAL NOT NULL DEFAULT '0.0'",
+            "ALTER TABLE " + INCIDENTS +
+                    "\nADD COLUMN " + IncidentsColumns.TO_LNG + " REAL NOT NULL DEFAULT '0.0'"
     };
 
     @OnUpgrade
