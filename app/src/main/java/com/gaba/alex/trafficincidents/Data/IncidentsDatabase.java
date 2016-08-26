@@ -16,15 +16,40 @@ limitations under the License.
 
 package com.gaba.alex.trafficincidents.Data;
 
+import android.database.sqlite.SQLiteDatabase;
+
 import net.simonvt.schematic.annotation.Database;
+import net.simonvt.schematic.annotation.OnUpgrade;
 import net.simonvt.schematic.annotation.Table;
 
 @Database(version = IncidentsDatabase.VERSION)
 public class IncidentsDatabase {
     private IncidentsDatabase(){}
 
-    public static final int VERSION = 2;
+    public static final int VERSION = 3;
 
     @Table(IncidentsColumns.class) public static final String INCIDENTS = "incidents";
     @Table(SettingsColumns.class) public static final String SETTINGS = "settings";
+
+    public static final String[] _MIGRATIONS = {
+            "ALTER TABLE " + INCIDENTS + " ADD ( "
+                    + IncidentsColumns.TO_LAT + " REAL NOT NULL DEFAULT 0.0, "
+                    + IncidentsColumns.TO_LNG + " REAL NOT NULL DEFAULT 0.0)"
+    };
+
+    @OnUpgrade
+    public static void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+        for (int i = oldVersion; i < newVersion; i++) {
+            String migration = _MIGRATIONS[i - 2];
+            db.beginTransaction();
+            try {
+                db.execSQL(migration);
+                db.setTransactionSuccessful();
+            } catch (Exception e) {
+                break;
+            } finally {
+                db.endTransaction();
+            }
+        }
+    }
 }

@@ -60,6 +60,8 @@ public class IncidentsAdapter extends SimpleCursorAdapter {
         final int severity = cursor.getInt(cursor.getColumnIndexOrThrow(IncidentsColumns.SEVERITY));
         final double lat = cursor.getDouble(cursor.getColumnIndexOrThrow(IncidentsColumns.LAT));
         final double lng = cursor.getDouble(cursor.getColumnIndexOrThrow(IncidentsColumns.LNG));
+        final double toLat = cursor.getDouble(cursor.getColumnIndexOrThrow(IncidentsColumns.TO_LAT));
+        final double toLng = cursor.getDouble(cursor.getColumnIndexOrThrow(IncidentsColumns.TO_LNG));
         final long dateInMillis = Long.parseLong(cursor.getString(cursor.getColumnIndexOrThrow(IncidentsColumns.END_DATE)));
         final boolean roadClosed = Boolean.valueOf(cursor.getString(cursor.getColumnIndexOrThrow(IncidentsColumns.ROAD_CLOSED)));
         final String description = cursor.getString(cursor.getColumnIndexOrThrow(IncidentsColumns.DESCRIPTION));
@@ -112,7 +114,7 @@ public class IncidentsAdapter extends SimpleCursorAdapter {
         showOnMapImageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = Utility.buildShowOnMapIntent(mContext, lat, lng, description);
+                Intent intent = Utility.buildShowOnMapIntent(mContext, lat, lng, toLat, toLng, severity, description);
                 if (intent.resolveActivity(mContext.getPackageManager()) != null) {
                     mContext.startActivity(intent);
                 }

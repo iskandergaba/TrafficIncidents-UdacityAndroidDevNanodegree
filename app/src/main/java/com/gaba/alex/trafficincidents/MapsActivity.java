@@ -23,7 +23,10 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptor;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
@@ -54,9 +57,38 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         double lat = getIntent().getDoubleExtra("lat", 0);
         double lng = getIntent().getDoubleExtra("lng", 0);
+        double toLat = getIntent().getDoubleExtra("toLat", 0);
+        double toLng = getIntent().getDoubleExtra("toLng", 0);
+        int severity = getIntent().getIntExtra("severity", 1);
         String description = getIntent().getStringExtra("description");
-        LatLng incident = new LatLng(lat, lng);
-        mMap.addMarker(new MarkerOptions().position(incident).title(description));
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(incident, 15));
+        LatLng incidentStart = new LatLng(lat, lng);
+        LatLng incidentEnd = new LatLng(toLat, toLng);
+        LatLngBounds incidentBounds = getIncidentBounds(lat, lng, toLat, toLng);
+
+        mMap.addMarker(new MarkerOptions().position(incidentStart)
+                .title(getString(R.string.start) + " - " + description)
+                .icon(getIncidentIcon(severity)));
+        if (toLat != 0 || toLng != 0) {
+            mMap.addMarker(new MarkerOptions().position(incidentEnd)
+                    .title(getString(R.string.end) + " - " + description)
+                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)));
+            mMap.moveCamera(CameraUpdateFactory.newLatLngBounds(incidentBounds, 16));
+        } else {
+            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(incidentStart, 16));
+        }
+    }
+
+    private LatLngBounds getIncidentBounds (double lat, double lng, double toLat, double toLng) {
+        LatLng startBounds = new LatLng((lat < toLat) ? lat - 0.0005 : toLat - 0.0005, (lng < toLng) ? lng - 0.0005 : toLng - 0.0005);
+        LatLng endBounds = new LatLng((lat > toLat) ? lat + 0.0005 : toLat + 0.0005, (lng > toLng) ? lng + 0.0005 : toLng + 0.0005);
+        return new LatLngBounds(startBounds, endBounds);
+    }
+
+    private BitmapDescriptor getIncidentIcon(int severity) {
+        BitmapDescriptor[] colors = {BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN),
+                BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE),
+                BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE),
+                BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED)};
+        return colors[severity - 1];
     }
 }

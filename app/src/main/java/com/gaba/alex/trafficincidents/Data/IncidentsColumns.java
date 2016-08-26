@@ -17,6 +17,7 @@ limitations under the License.
 package com.gaba.alex.trafficincidents.Data;
 
 import net.simonvt.schematic.annotation.DataType;
+import net.simonvt.schematic.annotation.DefaultValue;
 import net.simonvt.schematic.annotation.NotNull;
 import net.simonvt.schematic.annotation.PrimaryKey;
 
@@ -27,16 +28,20 @@ public class IncidentsColumns {
     public static final String LAT = "latitude";
     @DataType(DataType.Type.REAL) @NotNull
     public static final String LNG = "longitude";
+    @DataType(DataType.Type.REAL) @NotNull @DefaultValue("0.0")
+    public static final String TO_LAT = "to_latitude";
+    @DataType(DataType.Type.REAL) @NotNull @DefaultValue("0.0")
+    public static final String TO_LNG = "to_longitude";
     @DataType(DataType.Type.INTEGER) @NotNull
     public static final String TYPE = "type";
     @DataType(DataType.Type.TEXT) @NotNull
     public static final String DESCRIPTION = "description";
-    @DataType(DataType.Type.INTEGER)
+    @DataType(DataType.Type.INTEGER) @NotNull
     public static final String SEVERITY = "severity";
     @DataType(DataType.Type.TEXT) @NotNull
     public static final String ROAD_CLOSED = "road_closed";
-    @DataType(DataType.Type.TEXT)
+    @DataType(DataType.Type.TEXT) @NotNull
     public static final String START_DATE= "start_date";
-    @DataType(DataType.Type.TEXT)
+    @DataType(DataType.Type.TEXT) @NotNull
     public static final String END_DATE = "end_date";
 }

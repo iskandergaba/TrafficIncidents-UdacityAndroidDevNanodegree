@@ -50,6 +50,7 @@ import java.util.List;
 public class Utility {
 
     public static final String BING_JSON_POINT_KEY = "point";
+    public static final String BING_JSON_TO_POINT_KEY = "toPoint";
     public static final String BING_JSON_COORDINATES_KEY = "coordinates";
     public static final String BING_JSON_TYPE_KEY = "type";
     public static final String BING_JSON_SEVERITY_KEY = "severity";
@@ -108,10 +109,13 @@ public class Utility {
         return intent;
     }
 
-    public static Intent buildShowOnMapIntent(Context context, double lat, double lng, String description) {
+    public static Intent buildShowOnMapIntent(Context context, double lat, double lng, double toLat, double toLng, int severity, String description) {
         Intent intent = new Intent(context, MapsActivity.class);
         intent.putExtra("lat", lat);
         intent.putExtra("lng", lng);
+        intent.putExtra("toLat", toLat);
+        intent.putExtra("toLng", toLng);
+        intent.putExtra("severity", severity);
         intent.putExtra("description", description);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         return intent;
@@ -186,6 +190,8 @@ public class Utility {
         try {
             double lat = incident.getJSONObject(BING_JSON_POINT_KEY).getJSONArray(BING_JSON_COORDINATES_KEY).getDouble(0);
             double lng = incident.getJSONObject(BING_JSON_POINT_KEY).getJSONArray(BING_JSON_COORDINATES_KEY).getDouble(1);
+            double toLat = incident.getJSONObject(BING_JSON_TO_POINT_KEY).getJSONArray(BING_JSON_COORDINATES_KEY).getDouble(0);
+            double toLng = incident.getJSONObject(BING_JSON_TO_POINT_KEY).getJSONArray(BING_JSON_COORDINATES_KEY).getDouble(1);
             int type = incident.getInt(BING_JSON_TYPE_KEY);
             int severity = incident.getInt(BING_JSON_SEVERITY_KEY);
             String id = incident.getString(BING_JSON_INCIDENT_ID_KEY);
@@ -197,6 +203,8 @@ public class Utility {
             endDateMillis = endDateMillis.substring(6, endDateMillis.length() - 2);
             builder.withValue(IncidentsColumns.LAT, lat);
             builder.withValue(IncidentsColumns.LNG, lng);
+            builder.withValue(IncidentsColumns.TO_LAT, toLat);
+            builder.withValue(IncidentsColumns.TO_LNG, toLng);
             builder.withValue(IncidentsColumns.TYPE, type);
             builder.withValue(IncidentsColumns.SEVERITY, severity);
             builder.withValue(IncidentsColumns._ID, id);

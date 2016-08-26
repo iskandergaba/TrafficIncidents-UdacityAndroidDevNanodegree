@@ -39,6 +39,8 @@
     <string name="provided_by">Provided by</string>
     <string name="yes">Yes</string>
     <string name="no">No</string>
+    <string name="start">Start</string>
+    <string name="end">End</string>
     <string name="powered_by_google">Powered by Google</string>
     <string name="powered_by_bing">Powered by Bing</string>
 
