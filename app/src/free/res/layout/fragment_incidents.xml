@@ -31,7 +31,8 @@
             android:paddingStart="@dimen/activity_horizontal_margin"
             android:paddingLeft="@dimen/activity_horizontal_margin"
             android:paddingEnd="@dimen/activity_horizontal_margin"
-            android:paddingRight="@dimen/activity_horizontal_margin">
+            android:paddingRight="@dimen/activity_horizontal_margin"
+            android:paddingBottom="8dp">
 
             <ImageView
                 android:layout_width="wrap_content"
@@ -52,18 +53,15 @@
         </LinearLayout>
 
         <FrameLayout
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
             <android.support.v4.widget.SwipeRefreshLayout
                 android:id="@+id/swipe_refresh_layout"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:orientation="vertical"
-                android:paddingBottom="@dimen/activity_vertical_margin"
-                android:paddingLeft="@dimen/activity_horizontal_margin"
-                android:paddingRight="@dimen/activity_horizontal_margin"
-                android:paddingTop="@dimen/activity_vertical_margin">
+                android:layout_marginLeft="6dp"
+                android:layout_marginRight="6dp">
 
                 <ListView
                     android:id="@+id/list_view"
@@ -71,7 +69,6 @@
                     android:layout_height="match_parent"
                     android:animateLayoutChanges="true"
                     android:divider="@android:color/transparent"
-                    android:dividerHeight="12dp"
                     tools:listitem="@layout/list_view_item">
                 </ListView>
 
