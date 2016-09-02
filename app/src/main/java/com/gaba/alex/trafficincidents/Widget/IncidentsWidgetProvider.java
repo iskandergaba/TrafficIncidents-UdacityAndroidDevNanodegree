@@ -24,6 +24,7 @@ import android.content.Intent;
 import android.widget.RemoteViews;
 
 import com.gaba.alex.trafficincidents.MainActivity;
+import com.gaba.alex.trafficincidents.MapsActivity;
 import com.gaba.alex.trafficincidents.R;
 
 public class IncidentsWidgetProvider extends AppWidgetProvider {
@@ -40,18 +41,17 @@ public class IncidentsWidgetProvider extends AppWidgetProvider {
                                 int appWidgetId) {
         RemoteViews rv = new RemoteViews(context.getPackageName(),
                 R.layout.widget_layout);
-        PendingIntent mainPendingIntent = PendingIntent.getActivity(context, 1, new Intent(context, MainActivity.class),
-                PendingIntent.FLAG_CANCEL_CURRENT);
-        PendingIntent showOnMapPendingIntent = PendingIntent.getActivity(context, 0, new Intent(),
+        PendingIntent mainPendingIntentTemplate = PendingIntent.getActivity(context, 0, new Intent(context, MainActivity.class),
                 PendingIntent.FLAG_UPDATE_CURRENT);
-        rv.setOnClickPendingIntent(R.id.widget_name, mainPendingIntent);
-        rv.setPendingIntentTemplate(R.id.list_view_widget, showOnMapPendingIntent);
+        PendingIntent showOnMapPendingIntentTemplate = PendingIntent.getActivity(context, 1, new Intent(context, MapsActivity.class),
+                PendingIntent.FLAG_UPDATE_CURRENT);
+        rv.setOnClickPendingIntent(R.id.widget_name, mainPendingIntentTemplate);
+        rv.setPendingIntentTemplate(R.id.list_view_widget, showOnMapPendingIntentTemplate);
         Intent adapter = new Intent(context, IncidentsWidgetService.class);
         adapter.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
         rv.setRemoteAdapter(R.id.list_view_widget, adapter);
         rv.setEmptyView(R.id.list_view_widget, R.id.empty_view_widget);
         appWidgetManager.updateAppWidget(appWidgetId, rv);
-        appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetId,
-                R.id.list_view_widget);
+        appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetId, R.id.list_view_widget);
     }
 }

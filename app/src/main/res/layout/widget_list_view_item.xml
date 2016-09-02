@@ -28,13 +28,12 @@
             android:fontFamily="sans-serif-condensed"
             android:textAppearance="?android:textAppearanceMediumInverse" />
 
-
     </LinearLayout>
 
     <ImageView
         android:id="@+id/show_on_map_button_widget"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:src="@drawable/ic_map"
         android:clickable="true"
         android:tint="@color/colorAccent"

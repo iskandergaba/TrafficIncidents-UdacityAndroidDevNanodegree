@@ -102,22 +102,15 @@ public class Utility {
         return typeColors[type - 1];
     }
 
-    public static Intent buildShowOnMapIntent(double lat, double lng) {
-        Intent intent = new Intent(Intent.ACTION_VIEW);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        intent.setData(Uri.parse(String.format("geo:%s,%s", lat, lng)));
-        return intent;
-    }
-
     public static Intent buildShowOnMapIntent(Context context, double lat, double lng, double toLat, double toLng, int severity, String description) {
         Intent intent = new Intent(context, MapsActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         intent.putExtra("lat", lat);
         intent.putExtra("lng", lng);
         intent.putExtra("toLat", toLat);
         intent.putExtra("toLng", toLng);
         intent.putExtra("severity", severity);
         intent.putExtra("description", description);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         return intent;
     }
 

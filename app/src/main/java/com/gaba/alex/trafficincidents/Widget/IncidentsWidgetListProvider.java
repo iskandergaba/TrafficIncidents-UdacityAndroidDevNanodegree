@@ -44,34 +44,42 @@ public class IncidentsWidgetListProvider implements RemoteViewsService.RemoteVie
     public RemoteViews getViewAt(int position) {
         RemoteViews rv = new RemoteViews(mContext.getPackageName(), R.layout.widget_list_view_item);
         if (mCursor.moveToPosition(position)) {
-            Intent intent = Utility.buildShowOnMapIntent(mCursor.getDouble(mCursor.getColumnIndex(IncidentsColumns.LAT)),
-                    mCursor.getDouble(mCursor.getColumnIndex(IncidentsColumns.LNG)));
+
+            Intent intent = Utility.buildShowOnMapIntent(mContext,
+                    mCursor.getDouble(mCursor.getColumnIndex(IncidentsColumns.LAT)),
+                    mCursor.getDouble(mCursor.getColumnIndex(IncidentsColumns.LNG)),
+                    mCursor.getDouble(mCursor.getColumnIndex(IncidentsColumns.TO_LAT)),
+                    mCursor.getDouble(mCursor.getColumnIndex(IncidentsColumns.TO_LNG)),
+                    mCursor.getInt(mCursor.getColumnIndex(IncidentsColumns.SEVERITY)),
+                    mCursor.getString(mCursor.getColumnIndex(IncidentsColumns.DESCRIPTION)));
+            intent.addFlags(Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS);
+            intent.putExtra("fromWidget", true);
             rv.setTextViewText(R.id.incident_type_widget,
                     Utility.getIncidentType(mContext, mCursor.getInt(mCursor.getColumnIndex(IncidentsColumns.TYPE))));
             rv.setTextViewText(R.id.incident_description_widget,
                     mCursor.getString(mCursor.getColumnIndex(IncidentsColumns.DESCRIPTION)));
             rv.setOnClickFillInIntent(R.id.show_on_map_button_widget, intent);
-            rv.setOnClickFillInIntent(R.id.widget_row, intent);
         }
         return rv;
     }
 
     @Override
     public void onCreate() {
-        Uri uri = IncidentsProvider.Settings.CONTENT_URI;
-        Cursor cursor = mContext.getContentResolver().query(uri, null, null, null, null);
+        Cursor cursor = mContext.getContentResolver().query(IncidentsProvider.Settings.CONTENT_URI, null, null, null, null);
         String selection = null;
         if (cursor != null && cursor.moveToFirst()) {
             double lat = cursor.getDouble(cursor.getColumnIndex(SettingsColumns.LAT));
             double lng = cursor.getDouble(cursor.getColumnIndex(SettingsColumns.LNG));
             double range = cursor.getDouble(cursor.getColumnIndex(SettingsColumns.RANGE));
-            selection = "ABS(" + IncidentsColumns.LAT + " - " +  lat + ") <= " + range +
-                    " AND ABS(" + IncidentsColumns.LNG + " - " +  lng + ") <= " + range;
+            selection = "ABS(" + IncidentsColumns.LAT + " - " + lat + ") <= " + range +
+                    " AND ABS(" + IncidentsColumns.LNG + " - " + lng + ") <= " + range;
             cursor.close();
         }
         mCursor = mContext.getContentResolver().query(IncidentsProvider.Incidents.CONTENT_URI,
-                new String[]{IncidentsColumns.LAT, IncidentsColumns.LNG, IncidentsColumns.TYPE,
-                        IncidentsColumns.DESCRIPTION}, selection, null,  IncidentsColumns.SEVERITY + " DESC");
+                new String[] {IncidentsColumns.LAT, IncidentsColumns.LNG, IncidentsColumns.TO_LAT, IncidentsColumns.TO_LNG,
+                        IncidentsColumns.TYPE, IncidentsColumns.SEVERITY, IncidentsColumns.DESCRIPTION},
+                selection, null,  IncidentsColumns.SEVERITY + " DESC");
+
     }
 
     @Override
@@ -88,8 +96,11 @@ public class IncidentsWidgetListProvider implements RemoteViewsService.RemoteVie
             cursor.close();
         }
         mCursor = mContext.getContentResolver().query(IncidentsProvider.Incidents.CONTENT_URI,
-                new String[]{IncidentsColumns.LAT, IncidentsColumns.LNG, IncidentsColumns.TYPE,
-                        IncidentsColumns.DESCRIPTION}, selection, null,  IncidentsColumns.SEVERITY + " DESC");
+                new String[]{IncidentsColumns.LAT, IncidentsColumns.LNG,
+                        IncidentsColumns.TO_LAT, IncidentsColumns.TO_LNG,
+                        IncidentsColumns.TYPE, IncidentsColumns.SEVERITY,
+                        IncidentsColumns.DESCRIPTION},
+                selection, null,  IncidentsColumns.SEVERITY + " DESC");
     }
 
     @Override
