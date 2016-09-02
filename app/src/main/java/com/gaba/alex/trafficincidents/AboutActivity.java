@@ -33,6 +33,10 @@ public class AboutActivity extends AppCompatActivity {
         if (getSupportActionBar() != null) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }
+
+        TextView versionNameTextView = (TextView)findViewById(R.id.version_name);
+        versionNameTextView.setText(String.format("%s %s", getString(R.string.version), BuildConfig.VERSION_NAME));
+
         TextView gitHubLink = (TextView)findViewById(R.id.github_link);
         gitHubLink.setMovementMethod(LinkMovementMethod.getInstance());
 
