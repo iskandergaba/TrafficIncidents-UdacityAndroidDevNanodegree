@@ -11,7 +11,7 @@
         android:id="@+id/widget_name"
         android:layout_width="match_parent"
         android:layout_height="@dimen/widget_bar_overflow_padding"
-        android:paddingStart="16dp"
+        android:paddingStart="@dimen/activity_horizontal_margin"
         android:paddingEnd="@dimen/activity_horizontal_margin"
         android:gravity="center_vertical"
         android:contentDescription="@string/app_name"
